@@ -8,11 +8,11 @@ A minimal, white-first visualization of **Read the Room Before Your Model Genera
 
 ## Explore
 
-**Scenarize:** scrub or play individual optimization steps; adjust margin, learning rate, and scenario; switch to recurrent prompt inference (Figure 2 / Equation 1). Embeddings, centroids, squared triplet distances, and loss update together. The teaching RNN uses real backpropagation through time on synthetic inputs.
+**Scenarize:** scrub or play individual optimization steps; adjust the margin and scenario; switch to recurrent prompt inference (Figure 2 / Equation 1). Embeddings, centroids, squared triplet distances, and loss update together. The teaching RNN uses real backpropagation through time on synthetic inputs.
 
-**Actout:** send the current embedding into the next module, drag it, rotate it with the direction slider or arrow keys, inspect five axes, and change endpoint temperatures. Signed cosine similarity, normalized weights, temperature, and illustrative token probabilities follow Equations 3 and the temperature softmax.
+**Actout:** send the current embedding into the next module, drag it, rotate it with playback or arrow keys, inspect five axes, and change endpoint temperatures. Signed cosine similarity, normalized weights, temperature, and illustrative token probabilities follow Equations 3 and the temperature softmax.
 
-**Experiments:** switch among the three main benchmarks, open the complete results table, and review the geometry ablation and task-only boundary.
+**Experiments:** compare the three main benchmarks in a compact table and review the geometry ablation and task-only boundary.
 
 ## Run
 
@@ -42,7 +42,7 @@ npm test
 
 ## Scientific scope
 
-The paper uses frozen Llama-3.1-8B-Instruct layer-16 hidden states (4096D), 32D scenario embeddings, nine labels, five axes, and triplet margin 0.3. The website uses a deterministic **2D teaching RNN with four synthetic input features and four prompt chunks**. It is not a PCA/UMAP of the published model, and is not a reproduction of the benchmark experiments. Its optimizer is simple gradient descent; the paper uses AdamW. Small learning-rate changes restart the teaching run.
+The paper uses frozen Llama-3.1-8B-Instruct layer-16 hidden states (4096D), 32D scenario embeddings, nine labels, five axes, and triplet margin 0.3. The website uses a deterministic **2D teaching RNN with four synthetic input features and four prompt chunks**. It is not a PCA/UMAP of the published model, and is not a reproduction of the benchmark experiments. Its optimizer is simple gradient descent; the paper uses AdamW. Changing the margin restarts the teaching run. The teaching model uses a fixed learning rate of 0.0035.
 
 Actout computes **cosine similarity to centroid-difference axis directions**, rather than similarity to individual raw centroids. It interpolates the two endpoint temperatures and normalizes axis contributions by absolute cosine similarity. Axes are not assumed orthogonal. The normalized point on the unit circle illustrates the cosine calculation. Vector magnitude does not affect temperature.
 
