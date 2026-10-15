@@ -1,0 +1,13 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {actout,trainingRun,triplet,makeAxes,labels,forward,inputs,dist} from '../geometry.js';
+const close=(a,b,e=1e-9)=>assert.ok(Math.abs(a-b)<e,`${a} != ${b}`);
+test('squared Euclidean triplet loss uses the paper margin',()=>{close(triplet([0,0],[.2,0],[.4,0],.3),.18);close(triplet([0,0],[.1,0],[1,0],.3),0);});
+test('Actout reproduces either endpoint on an aligned single axis',()=>{const axis={vector:[2,0],plus:.3,minus:1.4};close(actout([9,0],[axis]).temperature,.3);close(actout([-3,0],[axis]).temperature,1.4);});
+test('orthogonal axes contribute zero; weights are normalized',()=>{const axes=[{vector:[1,0],plus:.3,minus:1.4},{vector:[0,1],plus:1,minus:.65}];const a=actout([1,0],axes);close(a.temperature,.3);close(a.axes[1].weight,0);close(a.axes.reduce((s,a)=>s+a.weight,0),1);});
+test('cosine temperature is invariant to positive vector scaling',()=>{const axes=[{vector:[2,1],plus:.3,minus:1.4},{vector:[1,-3],plus:1,minus:.65}];close(actout([.3,.5],axes).temperature,actout([3,5],axes).temperature);});
+test('undefined direction returns no temperature',()=>{assert.equal(actout([0,0],[{vector:[1,0],plus:.3,minus:1.4}]).temperature,null);assert.equal(actout([1,0],[{vector:[0,1],plus:.3,minus:1.4}]).temperature,null);});
+test('multi-axis interpolation stays in the configured endpoint range',()=>{for(let k=0;k<100;k++){const a=actout([Math.cos(k),Math.sin(k)],[{vector:[1,.4],plus:.3,minus:1.5},{vector:[-.5,1],plus:.65,minus:1}]);assert.ok(a.temperature>=.3&&a.temperature<=1.5);}});
+test('toy training updates model parameters and embeddings and reduces loss',()=>{const frames=trainingRun();const a=frames[0],b=frames.at(-1);assert.ok(b.loss<a.loss*.1);assert.notDeepEqual(a.model.W,b.model.W);assert.notDeepEqual(a.model.U,b.model.U);assert.ok(dist(a.centroids[0],b.centroids[0])>.01);for(const f of frames)for(const p of f.points)assert.ok(p.p.every(Number.isFinite));});
+test('training frames and inference use the same RNN state',()=>{const f=trainingRun().at(-1);assert.deepEqual(f.chosen[0][0],forward(f.model,inputs(0,0)).at(-1));});
+test('the five axes use the specified centroid pairs, including non-adversarial mean',()=>{const centroids=labels.map(l=>l.pos);const axes=makeAxes(centroids);assert.equal(axes.length,5);assert.deepEqual(axes[0].vector,centroids[2].map((x,i)=>x-centroids[3][i]));const mean=centroids.slice(0,8).reduce((s,p)=>s.map((x,i)=>x+p[i]/8),[0,0]);assert.deepEqual(axes[2].start,mean);close(axes[2].minus,.875);});
