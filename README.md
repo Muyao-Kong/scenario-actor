@@ -3,6 +3,8 @@
 A minimal, white-first visualization of **Read the Room Before Your Model Generates** by Muyao Kong and Zhihao Lin.
 
 - Website: https://muyao-kong.github.io/scenario-actor/
+- Compare styles: https://muyao-kong.github.io/scenario-actor/compare/
+- Previous version (A): https://muyao-kong.github.io/scenario-actor/compare/original/
 - Paper: https://arxiv.org/abs/2610.18820
 - Share: [vector QR](assets/scenario-actor-qr.svg) · [1600px PNG](assets/scenario-actor-qr.png)
 
@@ -13,6 +15,10 @@ A minimal, white-first visualization of **Read the Room Before Your Model Genera
 **Actout:** send the current embedding into the next module, drag it, rotate it with playback or arrow keys, inspect five axes, and change endpoint temperatures. Signed cosine similarity, normalized weights, temperature, and illustrative token probabilities follow Equations 3 and the temperature softmax.
 
 **Experiments:** compare the three main benchmarks in a compact table and review the geometry ablation and task-only boundary.
+
+## Style comparison
+
+The main page is the simplified B version, with the original SVG logo and expanded vector formulas. `compare/original/` preserves the earlier version from commit `d17e9c8`, with relative asset paths adjusted and indexing disabled. Both versions share the unchanged numerical model in `geometry.js`. The comparison page includes same-width browser screenshots and direct links to both interactive demos. The main URL and QR code are unchanged.
 
 ## Run
 

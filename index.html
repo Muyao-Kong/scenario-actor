@@ -29,7 +29,7 @@
 <body>
 <a class="skip" href="#lab">Skip to simulation</a>
 <header class="site-header wrap">
-  <a class="brand" href="#" aria-label="Scenario-Actor home">Scenario-Actor</a>
+  <a class="brand" href="#" aria-label="Scenario-Actor home"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 25V7M5 25h22M5 25L24 6"/><circle cx="24" cy="6" r="3"/></svg>Scenario–Actor</a>
   <nav aria-label="Main navigation"><a href="#lab">Method</a><a href="#experiments">Experiments</a><a href="https://arxiv.org/abs/2610.18820" target="_blank" rel="noopener">Paper ↗</a></nav>
 </header>
 <main>
@@ -58,7 +58,7 @@
           <div id="training-controls"><div class="range-heading"><label for="margin">Margin <span data-math="\beta"></span></label><output id="margin-value">0.30</output></div><input id="margin" type="range" min="0.1" max="1" step="0.05" value="0.3"></div>
           <div class="metrics"><div><span id="distance-label">Similar distance²</span><output id="positive-distance">0.000</output></div><div><span id="negative-label">Opposite distance²</span><output id="negative-distance">0.000</output></div><div><span id="loss-label">Triplet loss</span><output id="loss-value">0.300</output></div></div>
           <button class="transfer-button" id="transfer">Continue with this embedding →</button>
-          <p class="note" id="model-note">A small RNN trained by gradient descent on synthetic inputs.</p>
+
         </aside>
       </div>
       <div class="equation-strip"><span class="equation-number" id="equation-source">Eq. 2</span><div id="scenarize-equation" data-math="\mathcal{L}=\max\!\left(0,\|s_{\mathcal P}-s_{\mathcal P^+}\|^2-\|s_{\mathcal P}-s_{\mathcal P^-}\|^2+\beta\right)"></div></div>
@@ -80,20 +80,20 @@
           <div class="endpoint-control"><label for="tau-plus"><span id="positive-endpoint">Rigorous</span><span data-math="\tau_i^+"></span><output id="tau-plus-value">0.30</output></label><input type="range" min="0.3" max="1.5" step="0.025" id="tau-plus" value="0.3"></div>
           <div class="endpoint-control"><label for="tau-minus"><span id="negative-endpoint">Brainstorming</span><span data-math="\tau_i^-"></span><output id="tau-minus-value">1.40</output></label><input type="range" min="0.3" max="1.5" step="0.025" id="tau-minus" value="1.4"></div>
           <div class="temperature-readout"><span>Selected temperature <span data-math="T"></span></span><output id="temperature-value">0.850</output></div>
-          <p class="note" id="actout-note">Cosine similarity depends on direction, not vector magnitude.</p>
+          <p class="note" id="actout-note" hidden></p>
         </aside>
       </div>
       <div class="actout-equations">
         <div class="equation-definition"><span data-math="u_i=s_i^+-s_i^-"></span><span data-math="\hat{s}_{\mathcal P}=\frac{s_{\mathcal P}}{\|s_{\mathcal P}\|}"></span><span data-math="\hat{u}_i=\frac{u_i}{\|u_i\|}"></span></div>
         <div class="equation-strip"><span class="equation-number">Per axis</span><div data-math="T_i=\frac{1+\hat{s}_{\mathcal P}^{\top}\hat{u}_i}{2}\tau_i^++\frac{1-\hat{s}_{\mathcal P}^{\top}\hat{u}_i}{2}\tau_i^-"></div></div>
         <div class="equation-strip"><span class="equation-number">Eq. 3</span><div data-math="T=\frac{\sum_{i=1}^{5}|\hat{s}_{\mathcal P}^{\top}\hat{u}_i|\,T_i}{\sum_{i=1}^{5}|\hat{s}_{\mathcal P}^{\top}\hat{u}_i|}"></div></div>
-        <p class="equation-caption">The weight of each axis is its absolute cosine similarity, normalized across the five axes.</p>
+        <p class="equation-caption">Axis weights are normalized absolute cosine similarities.</p>
       </div>
       <div class="legend"><span><i class="point-key"></i> Prompt embedding</span><span><i class="axis-key"></i> Selected axis</span><span><i class="centroid-key"></i> Class centroid</span><span class="projection-key">┄</span><span>Orthogonal projection</span></div>
       <details class="sampling-details"><summary>Sampling distribution</summary><div class="sampling-row"><div data-math="p(v\mid T)=\frac{\exp(z_v/T)}{\sum_u\exp(z_u/T)}"></div><div id="token-bars" aria-label="Illustrative next-token probabilities"></div></div><p class="note">Illustrative logits. The selected temperature stays fixed during this prompt’s generation.</p></details>
     </div>
   </div>
-  <p class="method-note"><span data-math="\mathcal{S}=\operatorname{span}\{s_{\mathcal P}\}\subseteq\mathbb{R}^{m}"></span><span>The scenario space contains the learned embeddings. The simulation illustrates the method; it does not reproduce the paper’s trained embeddings.</span></p>
+  <p class="method-note"><span data-math="\mathcal{S}=\operatorname{span}\{s_{\mathcal P}\}\subseteq\mathbb{R}^{m}"></span><span>Scenario space is the span of the learned embeddings. This is a synthetic 2D illustration.</span></p>
 </section>
 <section id="experiments" class="experiments wrap" aria-labelledby="experiment-title">
   <div class="section-heading"><h2 id="experiment-title">Experiments</h2><p>Llama-3.1-8B-Instruct · selected baselines from Table 1</p></div>
@@ -102,7 +102,7 @@
   <div class="findings"><p><strong>Geometry ablation.</strong> AlpacaEval LC-WR is 30.03% with geometric interpolation and 27.10% with class-conditioned temperature lookup. <a href="https://arxiv.org/html/2610.18820v1#S4.SS4" target="_blank" rel="noopener">Table 6 ↗</a></p><p><strong>Task-only setting.</strong> On GSM8K, accuracy is 65.28% for Scenario-Actor and 77.18% for greedy decoding. Results are established for one model and the nine-label, five-axis taxonomy. <a href="https://arxiv.org/html/2610.18820v1#S4.SS3" target="_blank" rel="noopener">Table 3 ↗</a></p></div>
 </section>
 <section class="paper-section wrap" id="paper">
-  <div><h2>Paper and resources</h2><div class="paper-actions"><a href="https://arxiv.org/abs/2610.18820" target="_blank" rel="noopener">Paper ↗</a><a href="https://github.com/Muyao-Kong/scenario-actor" target="_blank" rel="noopener">Website source ↗</a><button class="text-button" id="copy-citation">Copy BibTeX</button></div><output id="copy-status" class="note" aria-live="polite"></output><details class="citation-fallback"><summary>BibTeX</summary><pre id="bibtex">@article{kong2026read,
+  <div><h2>Paper and resources</h2><div class="paper-actions"><a href="https://arxiv.org/abs/2610.18820" target="_blank" rel="noopener">Paper ↗</a><a href="https://github.com/Muyao-Kong/scenario-actor" target="_blank" rel="noopener">Website source ↗</a><a href="compare/">Compare styles</a><button class="text-button" id="copy-citation">Copy BibTeX</button></div><output id="copy-status" class="note" aria-live="polite"></output><details class="citation-fallback"><summary>BibTeX</summary><pre id="bibtex">@article{kong2026read,
   title={Read the Room Before Your Model Generates},
   author={Kong, Muyao and Lin, Zhihao},
   journal={arXiv preprint arXiv:2610.18820},

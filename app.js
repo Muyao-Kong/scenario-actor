@@ -70,7 +70,6 @@ function setView(view){
  $('#scenarize-legend').innerHTML=infer?'<span><i class="point-key"></i> Scenario estimate</span><span><i class="point-key similar"></i> STM contribution</span><span><i class="point-key smm"></i> SMM contribution</span><span><i class="centroid-key"></i> Class centroid</span>':'<span><i class="point-key"></i> Prompt embedding</span><span><i class="point-key similar"></i> Similar scenario</span><span><i class="point-key opposite"></i> Opposite scenario</span><span><i class="centroid-key"></i> Class centroid</span>';
  $('#control-desc').textContent=infer?'Each prompt chunk updates the scenario estimate through SMM and STM.':'The loss draws similar scenarios closer and separates opposite scenarios.';
  $('#positive-distance').previousElementSibling.textContent=infer?'First coordinate':'Similar distance²';$('#negative-distance').previousElementSibling.textContent=infer?'Second coordinate':'Opposite distance²';$('#loss-label').textContent=infer?'Vector norm':'Triplet loss';$('#next').setAttribute('aria-label',infer?'Next token step':'Next training step');
- $('#model-note').textContent=infer?'Four synthetic prompt chunks stand in for tokens (Figure 2).':'A small RNN trained by gradient descent on synthetic inputs.';
  $('#scenarize-equation').innerHTML=math(infer?'s_t=\\tanh(U_{\\mathrm{stm}}s_{t-1}+W_{\\mathrm{smm}}h_{p_t}^{(16)}+b)':'\\mathcal{L}=\\max\\!\\left(0,\\|s_{\\mathcal P}-s_{\\mathcal P^+}\\|^2-\\|s_{\\mathcal P}-s_{\\mathcal P^-}\\|^2+\\beta\\right)',true);
  $('#equation-source').textContent=infer?'Eq. 1':'Eq. 2';$('#progress').max=infer?4:160;$('#progress').step=infer?.01:1;$('#progress').setAttribute('aria-label',infer?'Prompt token step':'Training step');$('#progress-max').textContent=infer?'4':'160';state.step=infer?160:0;state.token=0;updateFlow();drawTrain();
 }
@@ -95,7 +94,8 @@ function drawActout(){
  $('#rho-value').textContent=(selected.rho>=0?'+':'')+selected.rho.toFixed(3);$('#angle-caption').textContent=`θ = ${(Math.acos(selected.rho)*180/Math.PI).toFixed(1)}°`;
  const temp=out.temperature;$('#temperature-value').textContent=temp===null?'—':temp.toFixed(3);
  $('#axis-contributions').innerHTML=out.axes.map((a,i)=>`<button class="contribution ${i===state.selectedAxis?'selected':''}" data-axis="${i}" title="Inspect ${a.name}; normalized weight ${(a.weight*100).toFixed(1)}%"><div><span>${a.name}</span><span>${(a.weight*100).toFixed(0)}%</span></div><div class="bar"><i style="width:${a.weight*100}%;background:${i===state.selectedAxis?'#5e7699':'#bdc8b1'}"></i></div></button>`).join('');
- $('#actout-note').textContent=state.selectedAxis===2?'Non-adversarial centroid = mean of the other eight centroids. Its temperature uses their mean (0.875), a demo convention; Table 2 does not specify it.':'Cosine similarity depends on direction, not vector magnitude. The dashed line shows its projection onto the selected axis.';
+ $('#actout-note').hidden=state.selectedAxis!==2;
+ $('#actout-note').textContent='Non-adversarial: mean of the other eight centroids. Its temperature (0.875) is a demo convention; Table 2 does not specify it.';
  const zs=[3.2,2.7,2.3,1.6,.9],names=['“the”','“a”','“this”','“one”','“our”'];const probs=zs.map(z=>Math.exp((z-3.2)/(temp||1)));const total=probs.reduce((a,b)=>a+b,0);
  $('#token-bars').innerHTML=probs.map((v,i)=>`<div class="token-bar"><output>${(v/total*100).toFixed(1)}%</output><i style="height:${v/total*92}%"></i><span>${names[i]}</span></div>`).join('');
 }

@@ -8,3 +8,6 @@
 .katex-display{margin:0;text-align:left}.katex-display>.katex{text-align:left}
 .equation-definition{display:flex;align-items:center;flex-wrap:wrap;gap:14px 32px;overflow:visible}.equation-definition>span{display:block}
 @media(max-width:600px){.equation-definition>span:first-child{flex-basis:100%}}
+
+.brand{display:flex;align-items:center;gap:9px}.brand svg{display:block;width:28px;height:28px;fill:#fff;stroke:var(--ink);stroke-width:1.5}
+@media(max-width:600px){.brand{gap:6px}.brand svg{width:23px;height:23px}nav{gap:14px}}
