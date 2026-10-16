@@ -2,7 +2,7 @@ import {add,labels,results,trainingRun,forward,inputs,makeAxes,actout,unit,norm,
 import {camera,project,spherePoint,angleArc,rotateVector} from './scene3d.js?v=3d1';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const state={module:'scenarize',view:'train',step:0,token:0,playing:false,scenario:0,beta:.3,lr:.0035,selectedAxis:1,vector:[.58,.32,.46],orbit:false,overrides:{}};
-let frames=trainingRun(), last=0, heroPhase=0, heroAuto=true, actoutFrame=frames.at(-1);
+let frames=trainingRun(), last=0, heroDragging=false, heroResumeAt=0, heroSpeed=0, lastHeroDraw=0, actoutFrame=frames.at(-1);
 const mathCache=new Map();
 function math(tex,display=false){const key=`${display}:${tex}`;if(!mathCache.has(key))mathCache.set(key,window.katex.renderToString(tex,{displayMode:display,throwOnError:true,output:'htmlAndMathml',strict:'ignore'}));return mathCache.get(key);}
 function renderMath(root=document){root.querySelectorAll('[data-math]').forEach(el=>el.innerHTML=math(el.dataset.math,!!el.closest('.equation-strip,.equation-definition,.sampling-row')));}
@@ -125,7 +125,12 @@ function tick(now){
   drawTrain();updatePlay();
  }
  if(state.orbit&&state.module==='actout'){state.vector=rotateVector(state.vector,dt*.35,dt*.14*Math.cos(now/3500));drawActout();}
- if(heroAuto&&!reduced&&now%75<20){heroPhase+=dt;views.hero.yaw=.65+Math.sin(heroPhase*.3)*.13;drawHero();}
+ const targetSpeed=(!reduced&&!heroDragging&&now>=heroResumeAt) ? .12 : 0;
+ heroSpeed+=(targetSpeed-heroSpeed)*(1-Math.exp(-dt*3));
+ if(!heroDragging&&heroSpeed>1e-5){
+  views.hero.yaw+=heroSpeed*dt;
+  if(now-lastHeroDraw>=40){drawHero();lastHeroDraw=now;}
+ }
  requestAnimationFrame(tick);
 }
 function stopOrbit(){state.orbit=false;$('#orbit').textContent='▶';$('#orbit').setAttribute('aria-label','Animate scenario embedding');}
@@ -153,7 +158,7 @@ function bindScene(svg,view){
   const embedding=view==='act'&&!!e.target.closest('#embedding-handle');
   const c=camera(views[view].yaw,views[view].pitch,174);
   gesture={x:e.clientX,y:e.clientY,yaw:views[view].yaw,pitch:views[view].pitch,embedding,hemisphere:dot(state.vector,c.depth)>=0?1:-1,radius:Math.max(.12,norm(state.vector))};
-  if(view==='hero')heroAuto=false;if(embedding)stopOrbit();
+  if(view==='hero'){heroDragging=true;heroSpeed=0;}if(embedding)stopOrbit();
   svg.setPointerCapture(e.pointerId);svg.classList.add('rotating');e.preventDefault();
  });
  svg.addEventListener('pointermove',e=>{
@@ -167,15 +172,15 @@ function bindScene(svg,view){
   }
   repaint();
  });
- const finish=()=>{gesture=null;svg.classList.remove('rotating');};
- svg.addEventListener('pointerup',finish);svg.addEventListener('pointercancel',finish);
+ const finish=()=>{if(!gesture)return;gesture=null;if(view==='hero'){heroDragging=false;heroResumeAt=performance.now()+2000;}svg.classList.remove('rotating');};
+ svg.addEventListener('pointerup',finish);svg.addEventListener('pointercancel',finish);svg.addEventListener('lostpointercapture',finish);
  svg.addEventListener('keydown',e=>{
   if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))return;
   e.preventDefault();
   if(view==='act'&&e.target.closest('#embedding-handle')){
    stopOrbit();state.vector=rotateVector(state.vector,e.key==='ArrowLeft'?-.06:e.key==='ArrowRight'?.06:0,e.key==='ArrowUp'?.06:e.key==='ArrowDown'?-.06:0);drawActout();$('#embedding-handle').focus();
   }else{
-   if(view==='hero')heroAuto=false;
+   if(view==='hero'){heroSpeed=0;heroResumeAt=performance.now()+2000;}
    views[view].yaw+=e.key==='ArrowLeft'?-.08:e.key==='ArrowRight'?.08:0;
    views[view].pitch=Math.max(-1.15,Math.min(1.15,views[view].pitch+(e.key==='ArrowUp'?.06:e.key==='ArrowDown'?-.06:0)));repaint();
   }

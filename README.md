@@ -11,6 +11,8 @@ A minimal, white-first visualization of **Read the Room Before Your Model Genera
 
 ## Explore
 
+The introductory 3D scene rotates automatically. Drag it (or use arrow keys) to adjust the view; automatic rotation resumes smoothly after two idle seconds. Automatic motion respects reduced-motion preferences.
+
 **Scenarize:** rotate the 3D view; scrub or play individual optimization steps; adjust the margin and scenario; switch to recurrent prompt inference (Figure 2 / Equation 1). Embeddings, centroids, squared triplet distances, and loss update together. The teaching RNN uses real backpropagation through time on synthetic inputs.
 
 **Actout:** send the current embedding into the next module, drag it, rotate it with playback or arrow keys, inspect five axes, and change endpoint temperatures. Signed cosine similarity, normalized weights, temperature, and illustrative token probabilities follow Equations 3 and the temperature softmax.
@@ -19,7 +21,7 @@ A minimal, white-first visualization of **Read the Room Before Your Model Genera
 
 ## Style comparison
 
-The main page uses the selected split introduction, original SVG logo, enlarged author/date text, and the second version’s interface and expanded formulas. The archived B version is in `compare/simplified/`. `compare/original/` preserves the earlier version from commit `d17e9c8`, with relative asset paths adjusted and indexing disabled. Both archived versions share their original 2D numerical model in `compare/geometry-2d.js`. The current main page combines the first version’s split introduction with the second version’s controls and results, using a 3D teaching model. The comparison page includes same-width browser screenshots and direct links to both interactive demos. The main URL and QR code are unchanged.
+The main page uses the selected split introduction, original SVG logo, enlarged author/date text, and the second version’s interface. Actout presents two expanded equations, and the resource section uses the original open two-column layout with larger, standalone QR downloads. The archived B version is in `compare/simplified/`. `compare/original/` preserves the earlier version from commit `d17e9c8`, with relative asset paths adjusted and indexing disabled. Both archived versions share their original 2D numerical model in `compare/geometry-2d.js`. The current main page combines the first version’s split introduction with the second version’s controls and results, using a 3D teaching model. The comparison page includes same-width browser screenshots and direct links to both interactive demos. The main URL and QR code are unchanged.
 
 ## Run
 
