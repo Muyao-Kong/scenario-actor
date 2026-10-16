@@ -1,6 +1,6 @@
 // Orthographic camera for the three-dimensional teaching space.
 // Camera rotation changes only the view, never distances, angles, or temperature.
-import {dot,norm,unit,scale,add,sub} from './geometry.js?v=3d1';
+import {dot,norm,unit,scale,add,sub} from './geometry.js?v=3d5';
 export function camera(yaw=.65,pitch=.38,zoom=174,cx=380,cy=232){
  const c=Math.cos(yaw),s=Math.sin(yaw),p=Math.sin(pitch),q=Math.cos(pitch);
  return {yaw,pitch,zoom,cx,cy,right:[c,-s,0],up:[s*p,c*p,q],depth:[-s*q,-c*q,p]};

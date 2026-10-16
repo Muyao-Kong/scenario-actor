@@ -1,5 +1,5 @@
-import {add,labels,results,trainingRun,forward,inputs,makeAxes,actout,unit,norm,dot,scale,sub,dist,mix,smooth,triplet} from './geometry.js?v=3d1';
-import {camera,project,spherePoint,angleArc,rotateVector} from './scene3d.js?v=3d1';
+import {add,labels,results,trainingRun,forward,inputs,makeAxes,actout,unit,norm,dot,scale,sub,dist,mix,smooth,triplet} from './geometry.js?v=3d5';
+import {camera,project,spherePoint,angleArc,rotateVector} from './scene3d.js?v=3d5';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const state={module:'scenarize',view:'train',step:0,token:0,playing:false,scenario:0,beta:.3,lr:.0035,selectedAxis:1,vector:[.58,.32,.46],orbit:false,overrides:{}};
 let frames=trainingRun(), last=0, heroDragging=false, heroResumeAt=0, heroSpeed=0, lastHeroDraw=0, actoutFrame=frames.at(-1);
@@ -30,7 +30,7 @@ function base(id='plot',polar=false){
  for(let i=0;i<3;i++){
   const a=[0,0,0],b=[0,0,0];a[i]=-axis;b[i]=axis;
   s+=line(a,[0,0,0],'#d4dbce',.9,'stroke-dasharray="3 5"')+line([0,0,0],b,'#c3cdb9',1,`marker-end="url(#${id}-arrow)"`);
-  const label=scale(b,1.04);s+=ml(label,`x_{${i+1}}`,55,i===2?[8,-27]:[8,-7]);
+  const label=scale(b,i===2?.88:1.04);s+=ml(label,`x_{${i+1}}`,55,i===2?[8,-27]:[8,-7]);
  }
  if(polar){
   for(let ring=0;ring<3;ring++){
@@ -136,16 +136,18 @@ function tick(now){
 function stopOrbit(){state.orbit=false;$('#orbit').textContent='▶';$('#orbit').setAttribute('aria-label','Animate scenario embedding');}
 function drawHero(){
  activate('hero',190);
- const centroids=frames.at(-1).centroids.map(p=>scale(p,2.6));
+ const frame=frames.at(-1),displayScale=1.03/Math.max(...frame.points.map(p=>norm(p.p)));
+ const centroids=frame.centroids.map(p=>scale(p,displayScale));
  let s=base('hero');
- for(const [a,b,color] of [[0,1,'#95a9bc'],[2,3,'#a3b397']])s+=line(centroids[b],centroids[a],color,1.4,'marker-end="url(#hero-arrow)"');
- const focus=[0,1,2,3];
+ for(const [a,b,color] of [[0,1,'#95a9bc'],[2,3,'#a3b397'],[4,5,'#aa9fbb']])s+=line(centroids[b],centroids[a],color,1.4,'marker-end="url(#hero-arrow)"');
+ const focus=[0,1,2,3,4,5];
  focus.forEach((c,j)=>{
-  frames.at(-1).points.filter(p=>p.label===c).forEach(p=>s+=circle(scale(p.p,2.6),2.8,labels[c].color,'opacity=".28"'));
+  frame.points.filter(p=>p.label===c).forEach(p=>s+=circle(scale(p.p,displayScale),2.8,labels[c].color,'opacity=".28"'));
   s+=diamond(centroids[c],labels[c].color,4);
-  const q=xy(centroids[c]),label=['rigorous','brainstorming','institutional','casual'][j];
-  const offsets=[[-105,-30],[12,31],[-130,30],[25,30]][j];
-  s+=`<text x="${q[0]+offsets[0]}" y="${q[1]+offsets[1]}" class="svg-text">${label}</text>`;
+  const q=xy(centroids[c]),label=['rigorous','brainstorming','institutional','casual','formal','playful'][j];
+  const dx=q[0]-C.x,dy=q[1]-C.y,r=Math.max(1,Math.hypot(dx,dy));
+  const labelX=q[0]+dx/r*(label.length*4.9+15),labelY=q[1]+dy/r*25+6;
+  s+=`<text x="${labelX}" y="${labelY}" text-anchor="middle" class="svg-text">${label}</text>`;
  });
  const embedding=mix(centroids[3],centroids[6],.3);
  s+=line([0,0,0],embedding,'#c57647',1.9,'marker-end="url(#hero-arrow)"')+circle(embedding,15,'#c57647','opacity=".07"')+circle(embedding,6,'#c57647','stroke="#fff" stroke-width="2"')+ml(embedding,'s_{\\mathcal P}',90,[12,-33]);

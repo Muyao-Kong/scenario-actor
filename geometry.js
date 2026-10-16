@@ -19,16 +19,17 @@ export function actout(s,axes){
  const total=values.reduce((v,a)=>v+a.weight,0);
  return {temperature:total>1e-10?values.reduce((v,a)=>v+a.weight*a.estimate,0)/total:null,axes:values.map(a=>({...a,weight:total>1e-10?a.weight/total:0}))};
 }
+// Synthetic inputs span all three dimensions; these are not measured paper embeddings.
 export const labels=[
- {id:'rigorous',name:'Rigorous',color:'#546e9e',pos:[-.8,.25,0.45],temp:.30,opposite:1,prompt:'Explain / the result / carefully / with a proof.'},
- {id:'brainstorming',name:'Brainstorming',color:'#c98a40',pos:[.65,-.2,-0.38],temp:1.40,opposite:0,prompt:'Imagine / new directions / without limits / for this idea.'},
- {id:'institutional',name:'Institutional',color:'#668a87',pos:[-.55,-.4,-0.36],temp:.50,opposite:3,prompt:'Review / this request / under the policy / and resolve it.'},
- {id:'casual',name:'Casual conversation',color:'#9a9472',pos:[.6,.4,0.42],temp:1.10,opposite:2,prompt:'Hey / how was / your weekend / by the way?'},
- {id:'formal',name:'Formal',color:'#8a7ab3',pos:[-.4,.65,0.58],temp:.55,opposite:5,prompt:'Please / address the committee / with care / and courtesy.'},
- {id:'playful',name:'Playful',color:'#c57e89',pos:[.65,-.65,-0.48],temp:1.50,opposite:4,prompt:'Make / a silly joke / about my cat / being the boss.'},
- {id:'support_pos',name:'Positive support',color:'#90a16a',pos:[.12,.75,0.72],temp:1.00,opposite:7,prompt:'I finally / got the offer / after all that work / celebrate with me!'},
- {id:'support_neg',name:'Negative support',color:'#6a9db3',pos:[-.05,-.8,-0.68],temp:.65,opposite:6,prompt:'I feel / overwhelmed today / and could use / some reassurance.'},
- {id:'adversarial',name:'Adversarial',color:'#b77050',pos:[.82,.05,0.23],temp:.75,opposite:0,prompt:'I disagree / with your claim / defend it / with evidence.'}
+ {id:'rigorous',name:'Rigorous',color:'#546e9e',pos:[-.8,.15,.25],temp:.30,opposite:1,prompt:'Explain / the result / carefully / with a proof.'},
+ {id:'brainstorming',name:'Brainstorming',color:'#c98a40',pos:[.75,-.12,-.18],temp:1.40,opposite:0,prompt:'Imagine / new directions / without limits / for this idea.'},
+ {id:'institutional',name:'Institutional',color:'#668a87',pos:[-.2,-.75,.42],temp:.50,opposite:3,prompt:'Review / this request / under the policy / and resolve it.'},
+ {id:'casual',name:'Casual conversation',color:'#9a9472',pos:[.22,.8,-.32],temp:1.10,opposite:2,prompt:'Hey / how was / your weekend / by the way?'},
+ {id:'formal',name:'Formal',color:'#8a7ab3',pos:[-.12,.28,.85],temp:.55,opposite:5,prompt:'Please / address the committee / with care / and courtesy.'},
+ {id:'playful',name:'Playful',color:'#c57e89',pos:[.16,-.22,-.78],temp:1.50,opposite:4,prompt:'Make / a silly joke / about my cat / being the boss.'},
+ {id:'support_pos',name:'Positive support',color:'#90a16a',pos:[.62,.55,.46],temp:1.00,opposite:7,prompt:'I finally / got the offer / after all that work / celebrate with me!'},
+ {id:'support_neg',name:'Negative support',color:'#6a9db3',pos:[-.52,-.60,-.38],temp:.65,opposite:6,prompt:'I feel / overwhelmed today / and could use / some reassurance.'},
+ {id:'adversarial',name:'Adversarial',color:'#b77050',pos:[.65,-.45,.58],temp:.75,opposite:0,prompt:'I disagree / with your claim / defend it / with evidence.'}
 ];
 export function makeAxes(centroids,endpointOverrides={}){
  const mean=centroids.filter((_,i)=>i!==8).reduce((v,p)=>add(v,scale(p,1/8)),centroids[0].map(()=>0));

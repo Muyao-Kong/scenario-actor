@@ -15,6 +15,18 @@ test('the recurrent model learns three genuine coordinates',()=>{
  assert.ok(Math.abs(determinant)>.001);
  assert.deepEqual(b.chosen[0][0],forward(b.model,inputs(0,0)).at(-1));
 });
+test('the three displayed scenario pairs keep substantial depth throughout training',()=>{
+ const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+ for(const margin of [.1,.3,1]){
+  const frames=trainingRun(margin);
+  for(const frame of [frames[0],frames[40],frames.at(-1)]){
+   const axes=makeAxes(frame.centroids);
+   const [u,v,w]=[0,1,4].map(i=>unit(axes[i].vector));
+   // Unit-vector volume is scale invariant: small but nonzero depth is insufficient.
+   assert.ok(Math.abs(dot(u,cross(v,w)))>.5,`Nearly planar at margin ${margin}, step ${frame.step}`);
+  }
+ }
+});
 test('three-dimensional cosine temperature depends on the third coordinate',()=>{
  const axes=[{vector:[0,0,1],plus:.3,minus:1.5}];
  close(actout([0,0,2],axes).temperature,.3);close(actout([0,0,-2],axes).temperature,1.5);
