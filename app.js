@@ -45,10 +45,6 @@ function focusPrompt(token=null){
  const parts=labels[state.scenario].prompt.split(' / ');
  $('#prompt-text').innerHTML='“'+parts.map((t,i)=>`<span class="${token===null?'':i===Math.min(3,Math.max(0,Math.floor(token)-1))?'token-highlight':i>=token?'prompt-pending':''}">${t}</span>`).join(' ')+'”';
 }
-function updateFlow(){
- const infer=state.view==='infer',t=Math.floor(state.token);
- $('#rnn-flow').innerHTML=`<span class="flow-block ${infer?'active':''}">${math('h_{p_t}^{(16)}')}</span><span>→</span><span class="flow-block ${infer?'active':''}">SMM</span><span>+</span><span class="flow-block ${infer?'active':''}">STM ${math('s_{t-1}')}</span><span>→</span><span class="flow-block ${infer?'current':''}">${math('\\tanh')}</span><span>→</span><span class="flow-block current">${math(infer?`s_{${t}}`:'s_{\\mathcal P}')}</span>`;
-}
 function drawTrain(){
  activate('train',285);
  const f=interpolatedFrame(state.step),c=state.scenario;
@@ -83,13 +79,13 @@ function rebuild(){state.playing=false;state.step=0;state.token=0;frames=trainin
 function updatePlay(){$('#play').textContent=state.playing?'Ⅱ':'▶';$('#play').setAttribute('aria-label',`${state.playing?'Pause':'Play'} ${state.view==='train'?'training':'token inference'}`);}
 function setView(view){
  state.view=view;state.playing=false;updatePlay();$$('[data-view]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.view===view));
- const infer=view==='infer';if(infer)actoutFrame=frames.at(-1);$('#training-controls').hidden=infer;$('#rnn-flow').hidden=!infer;$('#third-coordinate-row').hidden=!infer;
+ const infer=view==='infer';if(infer)actoutFrame=frames.at(-1);$('#training-controls').hidden=infer;$('#third-coordinate-row').hidden=!infer;
  $('#control-title').textContent=infer?'Prompt inference':'Triplet training';
  $('#scenarize-legend').innerHTML=infer?'<span><i class="point-key"></i> Scenario estimate</span><span><i class="point-key similar"></i> STM contribution</span><span><i class="point-key smm"></i> SMM contribution</span><span><i class="centroid-key"></i> Class centroid</span>':'<span><i class="point-key"></i> Prompt embedding</span><span><i class="point-key similar"></i> Similar scenario</span><span><i class="point-key opposite"></i> Opposite scenario</span><span><i class="centroid-key"></i> Class centroid</span>';
  $('#control-desc').textContent=infer?'Each prompt chunk updates the scenario estimate through SMM and STM.':'The loss draws similar scenarios closer and separates opposite scenarios.';
  $('#positive-distance').previousElementSibling.textContent=infer?'First coordinate':'Similar distance²';$('#negative-distance').previousElementSibling.textContent=infer?'Second coordinate':'Opposite distance²';$('#loss-label').textContent=infer?'Vector norm':'Triplet loss';$('#next').setAttribute('aria-label',infer?'Next token step':'Next training step');
- $('#scenarize-equation').innerHTML=math(infer?'s_t=\\tanh(U_{\\mathrm{stm}}s_{t-1}+W_{\\mathrm{smm}}h_{p_t}^{(16)}+b)':'\\mathcal{L}=\\max\\!\\left(0,\\|s_{\\mathcal P}-s_{\\mathcal P^+}\\|^2-\\|s_{\\mathcal P}-s_{\\mathcal P^-}\\|^2+\\beta\\right)',true);
- $('#equation-source').textContent=infer?'Eq. 1':'Eq. 2';$('#progress').max=infer?4:160;$('#progress').step=infer?.01:1;$('#progress').setAttribute('aria-label',infer?'Prompt token step':'Training step');state.step=infer?160:0;state.token=0;updateFlow();drawTrain();
+ $('#scenarize-equation').innerHTML=math(infer?'\\begin{aligned}s_t&=\\operatorname{Scenarize}(h_{p_t}^{(r)})\\\\&=\\phi(U_{\\mathrm{stm}}s_{t-1}+W_{\\mathrm{smm}}h_{p_t}^{(r)}+b)\\end{aligned}':'\\mathcal{L}=\\max\\!\\left(0,d(s_{\\mathcal P},s_{\\mathcal P^+})-d(s_{\\mathcal P},s_{\\mathcal P^-})+\\beta\\right)',true);
+ $('#equation-source').textContent=infer?'Eq. 1':'Eq. 2';$('#progress').max=infer?4:160;$('#progress').step=infer?.01:1;$('#progress').setAttribute('aria-label',infer?'Prompt token step':'Training step');state.step=infer?160:0;state.token=0;drawTrain();
 }
 function setModule(module){state.module=module;state.playing=false;state.orbit=false;updatePlay();$('#orbit').textContent='▶';$('#orbit').setAttribute('aria-label','Animate scenario embedding');$$('[data-module]').forEach(b=>{const active=b.dataset.module===module;b.setAttribute('aria-selected',active);b.tabIndex=active?0:-1;});$('#panel-scenarize').hidden=module!=='scenarize';$('#panel-actout').hidden=module!=='actout';if(module==='actout'){syncEndpoints();drawActout();}else drawTrain();}
 function currentAxes(){return makeAxes(actoutFrame.centroids,state.overrides);}
@@ -121,7 +117,7 @@ function tick(now){
  const dt=Math.min(.08,last?(now-last)/1000:0);last=now;
  if(state.playing&&state.module==='scenarize'){
   if(state.view==='train'){state.step=Math.min(160,state.step+dt*12);if(state.step>=160)state.playing=false;}
-  else {state.token=Math.min(4,state.token+dt*.65);const prev=Math.floor(state.token-dt*.65);if(Math.floor(state.token)!==prev)updateFlow();if(state.token>=4)state.playing=false;}
+  else {state.token=Math.min(4,state.token+dt*.65);if(state.token>=4)state.playing=false;}
   drawTrain();updatePlay();
  }
  if(state.orbit&&state.module==='actout'){state.vector=rotateVector(state.vector,dt*.35,dt*.14*Math.cos(now/3500));drawActout();}
@@ -191,12 +187,12 @@ function bindScene(svg,view){
 function bind(){
  $$('[data-module]').forEach(b=>{b.addEventListener('click',()=>setModule(b.dataset.module));b.addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight','Home','End'].includes(e.key)){e.preventDefault();const module=['ArrowRight','End'].includes(e.key)?'actout':'scenarize';setModule(module);$(`[data-module="${module}"]`).focus();}});});
  $$('[data-view]').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.view)));
- $('#play').addEventListener('click',()=>{if(state.view==='train'&&state.step>=160)state.step=0;if(state.view==='infer'&&state.token>=4)state.token=0;state.playing=!state.playing;updatePlay();updateFlow();});
- $('#next').addEventListener('click',()=>{state.playing=false;state.view==='train'?state.step=Math.min(160,Math.floor(state.step)+1):state.token=Math.min(4,Math.floor(state.token)+1);updatePlay();updateFlow();drawTrain();});
- $('#progress').addEventListener('input',e=>{state.playing=false;state.view==='train'?state.step=+e.target.value:state.token=+e.target.value;updatePlay();updateFlow();drawTrain();});
+ $('#play').addEventListener('click',()=>{if(state.view==='train'&&state.step>=160)state.step=0;if(state.view==='infer'&&state.token>=4)state.token=0;state.playing=!state.playing;updatePlay();});
+ $('#next').addEventListener('click',()=>{state.playing=false;state.view==='train'?state.step=Math.min(160,Math.floor(state.step)+1):state.token=Math.min(4,Math.floor(state.token)+1);updatePlay();drawTrain();});
+ $('#progress').addEventListener('input',e=>{state.playing=false;state.view==='train'?state.step=+e.target.value:state.token=+e.target.value;updatePlay();drawTrain();});
  $('#scenario').addEventListener('change',e=>{state.scenario=+e.target.value;drawTrain();});
  $('#margin').addEventListener('input',e=>{state.beta=+e.target.value;$('#margin-value').textContent=state.beta.toFixed(2);rebuild();});
- $('#reset').addEventListener('click',()=>{views.train={yaw:.65,pitch:.38};views.act={yaw:.65,pitch:.38};if(state.module==='actout'){stopOrbit();state.vector=[.58,.32,.46];state.overrides={};syncEndpoints();drawActout();}else {state.playing=false;state.step=state.view==='infer'?160:0;state.token=0;updateFlow();updatePlay();drawTrain();}});
+ $('#reset').addEventListener('click',()=>{views.train={yaw:.65,pitch:.38};views.act={yaw:.65,pitch:.38};if(state.module==='actout'){stopOrbit();state.vector=[.58,.32,.46];state.overrides={};syncEndpoints();drawActout();}else {state.playing=false;state.step=state.view==='infer'?160:0;state.token=0;updatePlay();drawTrain();}});
  $('#transfer').addEventListener('click',()=>{actoutFrame=state.view==='train'?frames[Math.round(state.step)]:frames.at(-1);const p=state.view==='train'?actoutFrame.chosen[state.scenario][0]:forward(actoutFrame.model,inputs(state.scenario,0))[Math.floor(state.token)];state.vector=norm(p)>1e-6?[...p]:[.58,.32,.46];state.overrides={};setModule('actout');});
  $('#axis-select').addEventListener('change',e=>{state.selectedAxis=+e.target.value;syncEndpoints();drawActout();});
  $('#axis-contributions').addEventListener('click',e=>{const b=e.target.closest('[data-axis]');if(b){state.selectedAxis=+b.dataset.axis;syncEndpoints();drawActout();}});
@@ -208,9 +204,8 @@ function bind(){
 }
 function init(){
  renderMath();$('#scenario').innerHTML=labels.map((l,i)=>`<option value="${i}">${l.name}</option>`).join('');$('#axis-select').innerHTML=makeAxes(actoutFrame.centroids).map((a,i)=>`<option value="${i}" ${i===1?'selected':''}>${a.name}</option>`).join('');
- const comparison=results.find(r=>r.name==='Fixed T = 0.7');
- $('#results-table').innerHTML=[results[0],results[1],results[3],results[6],results[7]].map((r,i)=>`<tr class="${i===0?'ours':''}"><th scope="row">${r.name}</th><td>${r.as.toFixed(4)}</td><td>${r.ae.toFixed(2)}${i===0?`<span class="result-delta">+${(r.ae-comparison.ae).toFixed(2)} pp vs. T = 0.7</span>`:''}</td><td>${r.mt.toFixed(2)}</td></tr>`).join('');
+ $('#results-table').innerHTML=[results[0],results[1],results[3],results[6],results[7]].map((r,i)=>`<tr class="${i===0?'ours':''}"><th scope="row">${r.name}</th><td>${r.as.toFixed(4)}</td><td>${r.ae.toFixed(2)}</td><td>${r.mt.toFixed(2)}</td></tr>`).join('');
  addEventListener('resize',()=>{state.module==='actout'?drawActout():drawTrain();drawHero();});
- bind();updateFlow();drawTrain();drawHero();requestAnimationFrame(tick);
+ bind();drawTrain();drawHero();requestAnimationFrame(tick);
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();

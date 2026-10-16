@@ -21,9 +21,9 @@
   <meta name="citation_pdf_url" content="https://arxiv.org/pdf/2610.18820">
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <link rel="stylesheet" href="assets/katex/katex.min.css">
-  <link rel="stylesheet" href="style.css?v=3d6">
+  <link rel="stylesheet" href="style.css?v=3d7">
   <script defer src="assets/katex/katex.min.js"></script>
-  <script type="module" src="app.js?v=3d6"></script>
+  <script type="module" src="app.js?v=3d7"></script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Scenario-Actor","url":"https://muyao-kong.github.io/scenario-actor/","description":"Interactive visualization of scenario embeddings and scenario-adaptive sampling temperature.","about":{"@type":"ScholarlyArticle","name":"Read the Room Before Your Model Generates","url":"https://arxiv.org/abs/2610.18820","author":[{"@type":"Person","name":"Muyao Kong"},{"@type":"Person","name":"Zhihao Lin"}]}}</script>
 </head>
 <body>
@@ -52,7 +52,6 @@
           <div class="plot-toolbar"><div class="segmented" role="group" aria-label="Scenarize view"><button data-view="train" aria-pressed="true">Training</button><button data-view="infer" aria-pressed="false">Prompt inference</button></div></div>
           <div class="plot"><svg id="training-space" viewBox="0 0 760 470" role="img" tabindex="0" aria-label="Three-dimensional scenario embeddings during triplet-loss training. Drag or use arrow keys to rotate."></svg></div>
           <div class="transport"><button class="play-button" id="play" aria-label="Play training">▶</button><button class="text-button" id="next" aria-label="Next training step">›</button><label for="progress">Step <output id="step-value">0</output></label><input type="range" id="progress" aria-label="Training step" min="0" max="160" step="1" value="0"></div>
-          <div class="mini-flow" id="rnn-flow" hidden aria-label="Token by token recurrent computation, Figure 2"></div>
         </div>
         <aside class="controls">
           <h3 id="control-title">Triplet training</h3>
@@ -65,7 +64,7 @@
 
         </aside>
       </div>
-      <div class="equation-strip"><span class="equation-number" id="equation-source">Eq. 2</span><div id="scenarize-equation" data-math="\mathcal{L}=\max\!\left(0,\|s_{\mathcal P}-s_{\mathcal P^+}\|^2-\|s_{\mathcal P}-s_{\mathcal P^-}\|^2+\beta\right)"></div></div>
+      <div class="equation-strip"><span class="equation-number" id="equation-source">Eq. 2</span><div id="scenarize-equation" data-math="\mathcal{L}=\max\!\left(0,d(s_{\mathcal P},s_{\mathcal P^+})-d(s_{\mathcal P},s_{\mathcal P^-})+\beta\right)"></div></div>
       <div class="legend" id="scenarize-legend"><span><i class="point-key"></i> Prompt embedding</span><span><i class="point-key similar"></i> Similar scenario</span><span><i class="point-key opposite"></i> Opposite scenario</span><span><i class="centroid-key"></i> Class centroid</span></div>
     </div>
     <div id="panel-actout" role="tabpanel" aria-labelledby="tab-actout" hidden>
@@ -99,7 +98,6 @@
 <section id="experiments" class="experiments wrap" aria-labelledby="experiment-title">
   <div class="section-heading"><h2 id="experiment-title">Experiments</h2><p>Llama-3.1-8B-Instruct · selected baselines from Table 1</p></div>
   <div class="table-scroll"><table><thead><tr><th scope="col">Method</th><th scope="col">AgentSense<br><span>Goal completion</span></th><th scope="col">AlpacaEval<br><span>LC-WR (%)</span></th><th scope="col">MT-Bench<br><span>GPT-4 score</span></th></tr></thead><tbody id="results-table"></tbody></table></div>
-  <p class="note">Relative to fixed T = 0.7, the AlpacaEval gain is significant (p = 0.0296); the AgentSense and MT-Bench differences are not. <a href="https://arxiv.org/html/2610.18820v1#A2" target="_blank" rel="noopener">Statistical details ↗</a></p>
   <div class="findings"><p><strong>Geometry ablation.</strong> AlpacaEval LC-WR is 30.03% with geometric interpolation and 27.10% with class-conditioned temperature lookup. <a href="https://arxiv.org/html/2610.18820v1#S4.SS4" target="_blank" rel="noopener">Table 6 ↗</a></p><p><strong>Task-only setting.</strong> On GSM8K, accuracy is 65.28% for Scenario-Actor and 77.18% for greedy decoding. Results are established for one model and the nine-label, five-axis taxonomy. <a href="https://arxiv.org/html/2610.18820v1#S4.SS3" target="_blank" rel="noopener">Table 3 ↗</a></p></div>
 </section>
 <section class="paper-section wrap" id="paper">
@@ -112,6 +110,6 @@
   <div class="qr-block"><img src="assets/scenario-actor-qr.png" alt="QR code linking to this visualization" width="184" height="184" loading="lazy"><div class="qr-downloads"><a href="assets/scenario-actor-qr.png" download="scenario-actor-qr.png">Download PNG</a></div></div>
 </section>
 </main>
-<footer class="wrap"><a href="#">Back to top ↑</a></footer>
+<footer class="wrap"><a href="#">Back to top</a></footer>
 <noscript><p class="wrap">Enable JavaScript for the simulations. Paper results and links are available above.</p></noscript>
 </body></html>
