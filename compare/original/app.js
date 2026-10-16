@@ -1,4 +1,4 @@
-import {labels,results,trainingRun,forward,inputs,makeAxes,actout,unit,norm,dot,scale,sub,dist,mix,smooth,triplet} from '../../geometry.js';
+import {labels,results,trainingRun,forward,inputs,makeAxes,actout,unit,norm,dot,scale,sub,dist,mix,smooth,triplet} from '../geometry-2d.js';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const state={module:'scenarize',view:'train',step:0,token:0,playing:false,speed:1,scenario:0,beta:.3,lr:.0035,selectedAxis:1,vector:[.65,.38],orbit:false,showAxes:true,overrides:{}};

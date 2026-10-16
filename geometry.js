@@ -20,18 +20,18 @@ export function actout(s,axes){
  return {temperature:total>1e-10?values.reduce((v,a)=>v+a.weight*a.estimate,0)/total:null,axes:values.map(a=>({...a,weight:total>1e-10?a.weight/total:0}))};
 }
 export const labels=[
- {id:'rigorous',name:'Rigorous',color:'#546e9e',pos:[-.8,.25],temp:.30,opposite:1,prompt:'Explain / the result / carefully / with a proof.'},
- {id:'brainstorming',name:'Brainstorming',color:'#c98a40',pos:[.65,-.2],temp:1.40,opposite:0,prompt:'Imagine / new directions / without limits / for this idea.'},
- {id:'institutional',name:'Institutional',color:'#668a87',pos:[-.55,-.4],temp:.50,opposite:3,prompt:'Review / this request / under the policy / and resolve it.'},
- {id:'casual',name:'Casual conversation',color:'#9a9472',pos:[.6,.4],temp:1.10,opposite:2,prompt:'Hey / how was / your weekend / by the way?'},
- {id:'formal',name:'Formal',color:'#8a7ab3',pos:[-.4,.65],temp:.55,opposite:5,prompt:'Please / address the committee / with care / and courtesy.'},
- {id:'playful',name:'Playful',color:'#c57e89',pos:[.65,-.65],temp:1.50,opposite:4,prompt:'Make / a silly joke / about my cat / being the boss.'},
- {id:'support_pos',name:'Positive support',color:'#90a16a',pos:[.12,.75],temp:1.00,opposite:7,prompt:'I finally / got the offer / after all that work / celebrate with me!'},
- {id:'support_neg',name:'Negative support',color:'#6a9db3',pos:[-.05,-.8],temp:.65,opposite:6,prompt:'I feel / overwhelmed today / and could use / some reassurance.'},
- {id:'adversarial',name:'Adversarial',color:'#b77050',pos:[.82,.05],temp:.75,opposite:0,prompt:'I disagree / with your claim / defend it / with evidence.'}
+ {id:'rigorous',name:'Rigorous',color:'#546e9e',pos:[-.8,.25,0.45],temp:.30,opposite:1,prompt:'Explain / the result / carefully / with a proof.'},
+ {id:'brainstorming',name:'Brainstorming',color:'#c98a40',pos:[.65,-.2,-0.38],temp:1.40,opposite:0,prompt:'Imagine / new directions / without limits / for this idea.'},
+ {id:'institutional',name:'Institutional',color:'#668a87',pos:[-.55,-.4,-0.36],temp:.50,opposite:3,prompt:'Review / this request / under the policy / and resolve it.'},
+ {id:'casual',name:'Casual conversation',color:'#9a9472',pos:[.6,.4,0.42],temp:1.10,opposite:2,prompt:'Hey / how was / your weekend / by the way?'},
+ {id:'formal',name:'Formal',color:'#8a7ab3',pos:[-.4,.65,0.58],temp:.55,opposite:5,prompt:'Please / address the committee / with care / and courtesy.'},
+ {id:'playful',name:'Playful',color:'#c57e89',pos:[.65,-.65,-0.48],temp:1.50,opposite:4,prompt:'Make / a silly joke / about my cat / being the boss.'},
+ {id:'support_pos',name:'Positive support',color:'#90a16a',pos:[.12,.75,0.72],temp:1.00,opposite:7,prompt:'I finally / got the offer / after all that work / celebrate with me!'},
+ {id:'support_neg',name:'Negative support',color:'#6a9db3',pos:[-.05,-.8,-0.68],temp:.65,opposite:6,prompt:'I feel / overwhelmed today / and could use / some reassurance.'},
+ {id:'adversarial',name:'Adversarial',color:'#b77050',pos:[.82,.05,0.23],temp:.75,opposite:0,prompt:'I disagree / with your claim / defend it / with evidence.'}
 ];
 export function makeAxes(centroids,endpointOverrides={}){
- const mean=centroids.filter((_,i)=>i!==8).reduce((v,p)=>add(v,scale(p,1/8)),[0,0]);
+ const mean=centroids.filter((_,i)=>i!==8).reduce((v,p)=>add(v,scale(p,1/8)),centroids[0].map(()=>0));
  // Table 2 gives no non-adversarial temperature. Its mean below is a demo convention.
  const nonAdvTemp=labels.filter((_,i)=>i!==8).reduce((s,l)=>s+l.temp,0)/8;
  return [
@@ -41,13 +41,13 @@ export function makeAxes(centroids,endpointOverrides={}){
  ].map((a,i)=>({...a,color:['#668a87','#546e9e','#b77050','#90a16a','#8a7ab3'][i],start:a.b<0?mean:centroids[a.b],end:centroids[a.a],vector:sub(centroids[a.a],a.b<0?mean:centroids[a.b]),plus:labels[a.a].temp,minus:a.b<0?nonAdvTemp:labels[a.b].temp,...endpointOverrides[i]}));
 }
 function rng(seed){return()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
-export function createModel(){return {W:[[.11,-.04,.035,.02],[.015,.09,-.025,.035]],U:[[.42,.04],[-.03,.38]],b:[0,0]};}
+export function createModel(){return {W:[[.11,-.04,.035,.02],[.015,.09,-.025,.035],[-.02,.015,.10,-.025]],U:[[.42,.04,-.02],[-.03,.38,.025],[.02,-.015,.40]],b:[0,0,0]};}
 export function inputs(label,index=0){
  const r=rng(71+label*317+index*911),p=labels[label].pos;
- return Array.from({length:4},(_,t)=>{const strength=(t+1)/4;return [p[0]*strength+(r()-.5)*.18,p[1]*strength+(r()-.5)*.18,(r()-.5)*.35,(r()-.5)*.35];});
+ return Array.from({length:4},(_,t)=>{const strength=(t+1)/4;return [p[0]*strength+(r()-.5)*.18,p[1]*strength+(r()-.5)*.18,p[2]*strength+(r()-.5)*.18,(r()-.5)*.35];});
 }
 export function forward(model,xs){
- const states=[[0,0]];
+ const states=[model.b.map(()=>0)];
  xs.forEach(x=>states.push(model.b.map((v,j)=>Math.tanh(v+dot(model.W[j],x)+dot(model.U[j],states.at(-1))))));
  return states;
 }
@@ -55,16 +55,16 @@ function backward(model,xs,states,gradient,g){
  let ds=[...gradient];
  for(let t=xs.length-1;t>=0;t--){
   const dz=ds.map((v,j)=>v*(1-states[t+1][j]**2));
-  for(let j=0;j<2;j++){
+  for(let j=0;j<model.b.length;j++){
    g.b[j]+=dz[j];
-   for(let k=0;k<4;k++)g.W[j][k]+=dz[j]*xs[t][k];
-   for(let k=0;k<2;k++)g.U[j][k]+=dz[j]*states[t][k];
+   for(let k=0;k<xs[t].length;k++)g.W[j][k]+=dz[j]*xs[t][k];
+   for(let k=0;k<model.b.length;k++)g.U[j][k]+=dz[j]*states[t][k];
   }
-  ds=[0,1].map(k=>dz.reduce((v,d,j)=>v+d*model.U[j][k],0));
+  ds=model.b.map((_,k)=>dz.reduce((v,d,j)=>v+d*model.U[j][k],0));
  }
 }
 export function trainStep(model,step,beta=.3,lr=.0035){
- const g={W:[[0,0,0,0],[0,0,0,0]],U:[[0,0],[0,0]],b:[0,0]};let loss=0;
+ const g={W:model.W.map(r=>r.map(()=>0)),U:model.U.map(r=>r.map(()=>0)),b:model.b.map(()=>0)};let loss=0;
  for(let c=0;c<labels.length;c++){
   const seqs=[inputs(c,(step%7)+1),inputs(c,(step%7)+9),inputs(labels[c].opposite,(step%7)+5)];
   const states=seqs.map(x=>forward(model,x)),[a,p,n]=states.map(x=>x.at(-1));
@@ -82,7 +82,7 @@ export function trainingRun(beta=.3,lr=.0035,count=160){
  const model=createModel(),frames=[];
  for(let step=0;step<=count;step++){
   const points=labels.flatMap((_,c)=>Array.from({length:10},(_,i)=>({label:c,p:forward(model,inputs(c,i)).at(-1)})));
-  const centroids=labels.map((_,c)=>points.filter(p=>p.label===c).reduce((s,p)=>add(s,scale(p.p,.1)),[0,0]));
+  const centroids=labels.map((_,c)=>points.filter(p=>p.label===c).reduce((s,p)=>add(s,scale(p.p,.1)),model.b.map(()=>0)));
   const chosen=labels.map((l,c)=>[forward(model,inputs(c,0)).at(-1),forward(model,inputs(c,9)).at(-1),forward(model,inputs(l.opposite,0)).at(-1)]);
   frames.push({step,points,centroids,chosen,model:JSON.parse(JSON.stringify(model)),loss:chosen.reduce((s,[a,p,n])=>s+triplet(a,p,n,beta),0)/9});
   if(step<count)trainStep(model,step,beta,lr);
