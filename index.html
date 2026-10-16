@@ -21,15 +21,15 @@
   <meta name="citation_pdf_url" content="https://arxiv.org/pdf/2610.18820">
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <link rel="stylesheet" href="assets/katex/katex.min.css">
-  <link rel="stylesheet" href="style.css?v=3d3">
+  <link rel="stylesheet" href="style.css?v=3d4">
   <script defer src="assets/katex/katex.min.js"></script>
-  <script type="module" src="app.js?v=3d2"></script>
+  <script type="module" src="app.js?v=3d4"></script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Scenario-Actor","url":"https://muyao-kong.github.io/scenario-actor/","description":"Interactive visualization of scenario embeddings and scenario-adaptive sampling temperature.","about":{"@type":"ScholarlyArticle","name":"Read the Room Before Your Model Generates","url":"https://arxiv.org/abs/2610.18820","author":[{"@type":"Person","name":"Muyao Kong"},{"@type":"Person","name":"Zhihao Lin"}]}}</script>
 </head>
 <body>
 <a class="skip" href="#lab">Skip to simulation</a>
 <header class="site-header wrap">
-  <a class="brand" href="#" aria-label="Scenario-Actor home"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 25V7M5 25h22M5 25L24 6"/><circle cx="24" cy="6" r="3"/></svg>Scenario–Actor</a>
+  <a class="brand" href="#" aria-label="Scenario-Actor home"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 25V7M5 25h22M5 25L24 6"/><circle cx="24" cy="6" r="3"/></svg>Scenario–Actor<span class="brand-tag">INTERACTIVE PAPER</span></a>
   <nav aria-label="Main navigation"><a href="#lab">Method</a><a href="#experiments">Experiments</a><a href="https://arxiv.org/abs/2610.18820" target="_blank" rel="noopener">Paper ↗</a></nav>
 </header>
 <main>
@@ -51,7 +51,7 @@
         <div class="canvas-column">
           <div class="plot-toolbar"><div class="segmented" role="group" aria-label="Scenarize view"><button data-view="train" aria-pressed="true">Training</button><button data-view="infer" aria-pressed="false">Prompt inference</button></div><span class="view-hint">Drag to rotate</span></div>
           <div class="plot"><svg id="training-space" viewBox="0 0 760 470" role="img" tabindex="0" aria-label="Three-dimensional scenario embeddings during triplet-loss training. Drag or use arrow keys to rotate."></svg></div>
-          <div class="transport"><button class="play-button" id="play" aria-label="Play training">▶</button><button class="text-button" id="next" aria-label="Next training step">Step →</button><label for="progress">Step <output id="step-value">0</output></label><input type="range" id="progress" aria-label="Training step" min="0" max="160" step="1" value="0"><output id="progress-max">160</output></div>
+          <div class="transport"><button class="play-button" id="play" aria-label="Play training">▶</button><button class="text-button" id="next" aria-label="Next training step">›</button><label for="progress">Step <output id="step-value">0</output></label><input type="range" id="progress" aria-label="Training step" min="0" max="160" step="1" value="0"></div>
           <div class="mini-flow" id="rnn-flow" hidden aria-label="Token by token recurrent computation, Figure 2"></div>
         </div>
         <aside class="controls">
@@ -79,7 +79,7 @@
         <aside class="controls">
           <h3>Temperature selection</h3><p>Endpoint temperatures are interpolated by alignment with each scenario axis.</p>
           <label class="field-label" for="axis-select">Scenario axis</label><select id="axis-select"></select>
-          <div class="cosine-readout"><span data-math="\cos\theta_i"></span><output id="rho-value">0.000</output><span id="angle-caption">θ = 90°</span></div>
+          <div class="cosine-readout"><span data-math="\rho_i=\hat{s}_{\mathcal P}^{\top}\hat{u}_i"></span><output id="rho-value">0.000</output><span id="angle-caption">θ = 90°</span></div>
           <div class="endpoint-title"><span>Endpoint temperatures</span><button id="restore-endpoints" class="text-button">Restore</button></div>
           <div class="endpoint-control"><label for="tau-plus"><span id="positive-endpoint">Rigorous</span><span data-math="\tau_i^+"></span><output id="tau-plus-value">0.30</output></label><input type="range" min="0.3" max="1.5" step="0.025" id="tau-plus" value="0.3"></div>
           <div class="endpoint-control"><label for="tau-minus"><span id="negative-endpoint">Brainstorming</span><span data-math="\tau_i^-"></span><output id="tau-minus-value">1.40</output></label><input type="range" min="0.3" max="1.5" step="0.025" id="tau-minus" value="1.4"></div>
@@ -88,8 +88,8 @@
         </aside>
       </div>
       <div class="actout-equations">
-        <div class="equation-strip"><span class="equation-number">Alignment</span><div data-math="\cos\theta_i=\frac{s_{\mathcal P}^{\top}(s_i^+-s_i^-)}{\|s_{\mathcal P}\|\,\|s_i^+-s_i^-\|}"></div></div>
-        <div class="equation-strip"><span class="equation-number">Eq. 3</span><div data-math="T=\frac{\displaystyle\sum_{i=1}^{5}|\cos\theta_i|\left(\frac{1+\cos\theta_i}{2}\tau_i^++\frac{1-\cos\theta_i}{2}\tau_i^-\right)}{\displaystyle\sum_{i=1}^{5}|\cos\theta_i|}"></div></div>
+        <div class="equation-strip"><span class="equation-number">Definition</span><div data-math="\rho_i=\hat{s}_{\mathcal P}^{\top}\hat{u}_i=\frac{s_{\mathcal P}^{\top}u_i}{\|s_{\mathcal P}\|\,\|u_i\|},\qquad u_i=s_i^+-s_i^-"></div></div>
+        <div class="equation-strip"><a class="equation-number" href="https://arxiv.org/pdf/2610.18820#page=4" target="_blank" rel="noopener">Eq. 3 ↗</a><div data-math="T=\frac{\displaystyle\sum_{i=1}^{k}|\rho_i|\left(\frac{1+\rho_i}{2}\tau_i^++\frac{1-\rho_i}{2}\tau_i^-\right)}{\displaystyle\sum_{i=1}^{k}|\rho_i|},\qquad\sum_{i=1}^{k}|\rho_i|>0"></div></div>
       </div>
       <div class="legend"><span><i class="point-key"></i> Prompt embedding</span><span><i class="axis-key"></i> Selected axis</span><span><i class="centroid-key"></i> Class centroid</span><span class="projection-key">┄</span><span>Orthogonal projection</span></div>
       <details class="sampling-details"><summary>Sampling distribution</summary><div class="sampling-row"><div data-math="p(v\mid T)=\frac{\exp(z_v/T)}{\sum_u\exp(z_u/T)}"></div><div id="token-bars" aria-label="Illustrative next-token probabilities"></div></div><p class="note">Illustrative logits. The selected temperature stays fixed during this prompt’s generation.</p></details>
@@ -109,7 +109,7 @@
   journal={arXiv preprint arXiv:2610.18820},
   year={2026}
 }</pre></details></div>
-  <div class="qr-block"><img src="assets/scenario-actor-qr.svg" alt="QR code linking to this visualization" width="184" height="184" loading="lazy"><div class="qr-downloads"><a href="assets/scenario-actor-qr.svg" download="scenario-actor-qr.svg">Download SVG</a><a href="assets/scenario-actor-qr.png" download="scenario-actor-qr.png">PNG ↗</a></div></div>
+  <div class="qr-block"><img src="assets/scenario-actor-qr.png" alt="QR code linking to this visualization" width="184" height="184" loading="lazy"><div class="qr-downloads"><a href="assets/scenario-actor-qr.png" download="scenario-actor-qr.png">Download PNG</a></div></div>
 </section>
 </main>
 <footer class="wrap"><span>Scenario-Actor · Interactive explanation</span><div><a href="compare/">Compare styles</a><a href="#">Back to top ↑</a></div></footer>
