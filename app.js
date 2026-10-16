@@ -208,7 +208,8 @@ function bind(){
 }
 function init(){
  renderMath();$('#scenario').innerHTML=labels.map((l,i)=>`<option value="${i}">${l.name}</option>`).join('');$('#axis-select').innerHTML=makeAxes(actoutFrame.centroids).map((a,i)=>`<option value="${i}" ${i===1?'selected':''}>${a.name}</option>`).join('');
- $('#results-table').innerHTML=[results[0],results[1],results[3],results[6],results[7]].map((r,i)=>`<tr class="${i===0?'ours':''}"><th scope="row">${r.name}</th><td>${r.as.toFixed(4)}</td><td>${r.ae.toFixed(2)}</td><td>${r.mt.toFixed(2)}</td></tr>`).join('');
+ const comparison=results.find(r=>r.name==='Fixed T = 0.7');
+ $('#results-table').innerHTML=[results[0],results[1],results[3],results[6],results[7]].map((r,i)=>`<tr class="${i===0?'ours':''}"><th scope="row">${r.name}</th><td>${r.as.toFixed(4)}</td><td>${r.ae.toFixed(2)}${i===0?`<span class="result-delta">+${(r.ae-comparison.ae).toFixed(2)} pp vs. T = 0.7</span>`:''}</td><td>${r.mt.toFixed(2)}</td></tr>`).join('');
  addEventListener('resize',()=>{state.module==='actout'?drawActout():drawTrain();drawHero();});
  bind();updateFlow();drawTrain();drawHero();requestAnimationFrame(tick);
 }
