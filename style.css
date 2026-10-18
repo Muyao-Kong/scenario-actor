@@ -107,7 +107,7 @@ body.deck-ready{background:#fff}
  .page-next:hover #page-next-arrow{animation:next-cue .84s linear 1}
  .page-previous:hover #page-previous-arrow{animation:previous-cue .84s linear 1}
 }
-@keyframes next-cue{0%,48%,100%{transform:translateY(0);animation-timing-function:var(--ease)}24%{transform:translateY(7px);animation-timing-function:cubic-bezier(.65,0,.35,1)}72%{transform:translateY(2px);animation-timing-function:cubic-bezier(.65,0,.35,1)}}
-@keyframes previous-cue{0%,48%,100%{transform:translateY(0);animation-timing-function:var(--ease)}24%{transform:translateY(-7px);animation-timing-function:cubic-bezier(.65,0,.35,1)}72%{transform:translateY(-2px);animation-timing-function:cubic-bezier(.65,0,.35,1)}}
+@keyframes next-cue{0%,48%,100%{transform:translateY(0);animation-timing-function:var(--ease)}24%{transform:translateY(7px);animation-timing-function:cubic-bezier(.65,0,.35,1)}72%{transform:translateY(3px);animation-timing-function:cubic-bezier(.65,0,.35,1)}}
+@keyframes previous-cue{0%,48%,100%{transform:translateY(0);animation-timing-function:var(--ease)}24%{transform:translateY(-7px);animation-timing-function:cubic-bezier(.65,0,.35,1)}72%{transform:translateY(-3px);animation-timing-function:cubic-bezier(.65,0,.35,1)}}
 @media(max-width:600px){.deck-ready #page-navigation{gap:4px}.deck-ready #page-previous{font-size:13px;gap:6px}}
 @media(prefers-reduced-motion:reduce){.deck-ready :is(.page-next,.page-previous){transform:none!important}}
