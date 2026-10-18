@@ -21,19 +21,19 @@
   <meta name="citation_pdf_url" content="https://arxiv.org/pdf/2610.18820">
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <link rel="stylesheet" href="assets/katex/katex.min.css">
-  <link rel="stylesheet" href="style.css?v=3d7">
+  <link rel="stylesheet" href="style.css?v=deck1">
   <script defer src="assets/katex/katex.min.js"></script>
-  <script type="module" src="app.js?v=3d7"></script>
+  <script type="module" src="app.js?v=deck1"></script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Scenario-Actor","url":"https://muyao-kong.github.io/scenario-actor/","description":"Interactive visualization of scenario embeddings and scenario-adaptive sampling temperature.","about":{"@type":"ScholarlyArticle","name":"Read the Room Before Your Model Generates","url":"https://arxiv.org/abs/2610.18820","author":[{"@type":"Person","name":"Muyao Kong"},{"@type":"Person","name":"Zhihao Lin"}]}}</script>
 </head>
 <body>
 <a class="skip" href="#lab">Skip to simulation</a>
 <header class="site-header wrap">
-  <a class="brand" href="#" aria-label="Scenario-Actor home"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 25V7M5 25h22M5 25L24 6"/><circle cx="24" cy="6" r="3"/></svg>Scenario–Actor<span class="brand-tag">INTERACTIVE PAPER</span></a>
-  <nav aria-label="Main navigation"><a href="#lab">Method</a><a href="#experiments">Experiments</a><a href="https://arxiv.org/abs/2610.18820" target="_blank" rel="noopener">Paper ↗</a></nav>
+  <a class="brand" href="#overview" aria-label="Scenario-Actor home"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 25V7M5 25h22M5 25L24 6"/><circle cx="24" cy="6" r="3"/></svg>Scenario–Actor<span class="brand-tag">INTERACTIVE PAPER</span></a>
+  <nav aria-label="Main navigation"><a href="#lab">Method</a><a href="#experiments">Experiments</a><a href="#paper">Paper</a></nav>
 </header>
-<main>
-<section class="hero wrap" aria-labelledby="hero-title">
+<main id="paper-deck" aria-label="Interactive paper pages">
+<section class="hero wrap story-card" id="overview" data-paper-page="Overview" aria-labelledby="hero-title">
   <div class="hero-copy">
     <h1 id="hero-title">Read the Room <br>Before Your Model <br><em>Generates</em></h1>
     <p class="hero-description">Scenario-Actor uses the geometry of a scenario embedding to select a prompt-level sampling temperature.</p>
@@ -42,7 +42,7 @@
   </div>
   <div class="hero-figure"><svg id="hero-space" viewBox="0 0 760 470" role="img" tabindex="0" aria-label="Three-dimensional scenario space. Drag or use arrow keys to rotate the view."></svg><div class="hero-caption"><span><i class="point-key"></i> Scenario embedding</span></div></div>
 </section>
-<section class="lab-section wrap" id="lab" aria-labelledby="lab-title">
+<section class="lab-section wrap story-card" id="lab" data-paper-page="Method" aria-labelledby="lab-title">
   <div class="section-heading"><h2 id="lab-title">Method</h2><p>Interactive 3D simulation with synthetic inputs. The paper uses 32D embeddings.</p></div>
   <div class="lab-shell">
     <div class="lab-top"><div class="module-tabs" role="tablist" aria-label="Framework module"><button id="tab-scenarize" role="tab" aria-selected="true" aria-controls="panel-scenarize" data-module="scenarize">Scenarize</button><button id="tab-actout" role="tab" aria-selected="false" aria-controls="panel-actout" data-module="actout">Actout</button></div><button class="text-button" id="reset" aria-label="Reset simulation">Reset</button></div>
@@ -94,13 +94,13 @@
     </div>
   </div>
 </section>
-<section id="experiments" class="experiments wrap" aria-labelledby="experiment-title">
+<section id="experiments" class="experiments wrap story-card" data-paper-page="Experiments" aria-labelledby="experiment-title">
   <div class="section-heading"><h2 id="experiment-title">Experiments</h2><p>Llama-3.1-8B-Instruct · selected baselines from Table 1</p></div>
   <div class="table-scroll"><table><thead><tr><th scope="col">Method</th><th scope="col">AgentSense<br><span>Goal completion</span></th><th scope="col">AlpacaEval<br><span>LC-WR (%)</span></th><th scope="col">MT-Bench<br><span>GPT-4 score</span></th></tr></thead><tbody id="results-table"></tbody></table></div>
   <div class="findings"><p><strong>Geometry ablation.</strong> AlpacaEval LC-WR is 30.03% with geometric interpolation and 27.10% with class-conditioned temperature lookup. <a href="https://arxiv.org/html/2610.18820v1#S4.SS4" target="_blank" rel="noopener">Table 6 ↗</a></p><p><strong>Task-only setting.</strong> On GSM8K, accuracy is 65.28% for Scenario-Actor and 77.18% for greedy decoding. Results are established for one model and the nine-label, five-axis taxonomy. <a href="https://arxiv.org/html/2610.18820v1#S4.SS3" target="_blank" rel="noopener">Table 3 ↗</a></p></div>
 </section>
-<section class="paper-section wrap" id="paper">
-  <div class="paper-copy"><h2>Read the room,<br><em>Share the room</em></h2><p class="paper-title">Read the Room Before Your Model Generates</p><p class="authors">Muyao Kong · Zhihao Lin <span>2026</span></p><div class="paper-actions"><a class="paper-button" href="https://arxiv.org/abs/2610.18820" target="_blank" rel="noopener">Read on arXiv <span>↗</span></a></div><details class="citation-fallback"><summary>BibTeX</summary><div class="citation-panel"><div class="citation-toolbar"><output id="copy-status" class="note" aria-live="polite"></output><button class="text-button" id="copy-citation">Copy</button></div><pre id="bibtex">@article{kong2026read,
+<section class="paper-section wrap story-card" id="paper" data-paper-page="Paper" aria-labelledby="paper-title">
+  <div class="paper-copy"><h2 id="paper-title">Read the room,<br><em>Share the room</em></h2><p class="paper-title">Read the Room Before Your Model Generates</p><p class="authors">Muyao Kong · Zhihao Lin <span>2026</span></p><div class="paper-actions"><a class="paper-button" href="https://arxiv.org/abs/2610.18820" target="_blank" rel="noopener">Read on arXiv <span>↗</span></a></div><details class="citation-fallback"><summary>BibTeX</summary><div class="citation-panel"><div class="citation-toolbar"><output id="copy-status" class="note" aria-live="polite"></output><button class="text-button" id="copy-citation">Copy</button></div><pre id="bibtex">@article{kong2026read,
   title={Read the Room Before Your Model Generates},
   author={Kong, Muyao and Lin, Zhihao},
   journal={arXiv preprint arXiv:2610.18820},
@@ -109,6 +109,10 @@
   <div class="qr-block"><img src="assets/scenario-actor-qr.png" alt="QR code linking to this visualization" width="184" height="184" loading="lazy"><div class="qr-downloads"><a href="assets/scenario-actor-qr.png" download="scenario-actor-qr.png">Download PNG</a></div></div>
 </section>
 </main>
-<footer class="wrap"><a href="#">Back to top</a></footer>
+<footer class="wrap" id="page-navigation" aria-label="Page navigation" hidden>
+  <a id="page-previous" href="#overview" hidden>Overview</a>
+  <span class="page-counter" role="status"><span id="page-count" aria-hidden="true">01 / 04</span><span id="page-announcement" class="sr-only">Overview, page 1 of 4</span></span>
+  <a id="page-next" class="page-next" href="#lab">Method</a>
+</footer>
 <noscript><p class="wrap">Enable JavaScript for the simulations. Paper results and links are available above.</p></noscript>
 </body></html>

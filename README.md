@@ -11,6 +11,8 @@ A minimal, white-first visualization of **Read the Room Before Your Model Genera
 
 ## Explore
 
+The paper is presented as four chapter cards: Overview, Method, Experiments, and Paper. Use the bottom chapter button or the top navigation to move between cards with a smooth vertical transition. Only the current card is interactive. Long content scrolls within its card, while chapter navigation stays visible. Browser back/forward and direct chapter links work; simulation parameters, camera orientation, and progress persist when revisiting Method. Playback pauses when leaving it. Reduced-motion preferences skip chapter transitions. Without JavaScript the content remains a conventional readable document.
+
 The introductory 3D scene rotates automatically. Drag it (or use arrow keys) to adjust the view; automatic rotation resumes smoothly after two idle seconds. Automatic motion respects reduced-motion preferences.
 
 **Scenarize:** rotate the 3D view; scrub or play individual optimization steps; adjust the margin and scenario; switch to recurrent prompt inference (Equation 1). Embeddings, centroids, squared triplet distances, and loss update together. The teaching RNN uses real backpropagation through time on synthetic inputs.
@@ -45,6 +47,7 @@ npm test
 - `style.css`: responsive layout, consistent drawing styles, and motion preferences.
 - `geometry.js`: small recurrent model, training, paper equations, scenario pairs, reported benchmark values.
 - `app.js`: projected 3D SVG drawing, smooth simulation playback, and interactions.
+- `deck.js`: chapter-card navigation, transitions, browser history, and accessible focus management.
 - `scene3d.js`: orthographic camera, ray/sphere dragging, spatial angle arcs, and 3D direction controls.
 - `assets/`: local math renderer/fonts, QR codes, favicon, and sharing image.
 - `scripts/assets.mjs`: reproducible vendor and QR generation.

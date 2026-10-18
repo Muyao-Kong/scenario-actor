@@ -1,8 +1,10 @@
+import {initPaperDeck} from './deck.js?v=deck1';
 import {add,labels,results,trainingRun,forward,inputs,makeAxes,actout,unit,norm,dot,scale,sub,dist,mix,smooth,triplet} from './geometry.js?v=3d5';
 import {camera,project,spherePoint,angleArc,rotateVector} from './scene3d.js?v=3d5';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const state={module:'scenarize',view:'train',step:0,token:0,playing:false,scenario:0,beta:.3,lr:.0035,selectedAxis:1,vector:[.58,.32,.46],orbit:false,overrides:{}};
 let frames=trainingRun(), last=0, heroDragging=false, heroResumeAt=0, heroSpeed=0, lastHeroDraw=0, actoutFrame=frames.at(-1);
+let paperDeck=null;
 const mathCache=new Map();
 function math(tex,display=false){const key=`${display}:${tex}`;if(!mathCache.has(key))mathCache.set(key,window.katex.renderToString(tex,{displayMode:display,throwOnError:true,output:'htmlAndMathml',strict:'ignore'}));return mathCache.get(key);}
 function renderMath(root=document){root.querySelectorAll('[data-math]').forEach(el=>el.innerHTML=math(el.dataset.math,!!el.closest('.equation-strip,.equation-definition,.sampling-row')));}
@@ -115,15 +117,15 @@ function drawActout(){
 }
 function tick(now){
  const dt=Math.min(.08,last?(now-last)/1000:0);last=now;
- if(state.playing&&state.module==='scenarize'){
+ if(paperDeck?.activePage==='lab'&&state.playing&&state.module==='scenarize'){
   if(state.view==='train'){state.step=Math.min(160,state.step+dt*12);if(state.step>=160)state.playing=false;}
   else {state.token=Math.min(4,state.token+dt*.65);if(state.token>=4)state.playing=false;}
   drawTrain();updatePlay();
  }
- if(state.orbit&&state.module==='actout'){state.vector=rotateVector(state.vector,dt*.35,dt*.14*Math.cos(now/3500));drawActout();}
- const targetSpeed=(!reduced&&!heroDragging&&now>=heroResumeAt) ? .12 : 0;
+ if(paperDeck?.activePage==='lab'&&state.orbit&&state.module==='actout'){state.vector=rotateVector(state.vector,dt*.35,dt*.14*Math.cos(now/3500));drawActout();}
+ const targetSpeed=(paperDeck?.activePage==='overview'&&!reduced&&!heroDragging&&now>=heroResumeAt) ? .12 : 0;
  heroSpeed+=(targetSpeed-heroSpeed)*(1-Math.exp(-dt*3));
- if(!heroDragging&&heroSpeed>1e-5){
+ if(paperDeck?.activePage==='overview'&&!heroDragging&&heroSpeed>1e-5){
   views.hero.yaw+=heroSpeed*dt;
   if(now-lastHeroDraw>=40){drawHero();lastHeroDraw=now;}
  }
@@ -206,6 +208,11 @@ function init(){
  renderMath();$('#scenario').innerHTML=labels.map((l,i)=>`<option value="${i}">${l.name}</option>`).join('');$('#axis-select').innerHTML=makeAxes(actoutFrame.centroids).map((a,i)=>`<option value="${i}" ${i===1?'selected':''}>${a.name}</option>`).join('');
  $('#results-table').innerHTML=[results[0],results[1],results[3],results[6],results[7]].map((r,i)=>`<tr class="${i===0?'ours':''}"><th scope="row">${r.name}</th><td>${r.as.toFixed(4)}</td><td>${r.ae.toFixed(2)}</td><td>${r.mt.toFixed(2)}</td></tr>`).join('');
  addEventListener('resize',()=>{state.module==='actout'?drawActout():drawTrain();drawHero();});
- bind();drawTrain();drawHero();requestAnimationFrame(tick);
+ bind();drawTrain();drawHero();
+ paperDeck=initPaperDeck(({page,target})=>{
+  if(page!=='lab'){state.playing=false;updatePlay();stopOrbit();}
+  else if(target?.closest('#panel-actout'))setModule('actout');
+ });
+ requestAnimationFrame(tick);
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
