@@ -96,20 +96,18 @@ body.deck-ready{background:#fff}
 
 /* Quiet, bidirectional navigation and a short two-beat directional cue. */
 .deck-ready #page-navigation{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)}
-.deck-ready .page-next{grid-column:2;justify-self:center;transform-origin:center bottom;transition:color .25s,transform .55s cubic-bezier(.2,1.5,.3,1)}
-.deck-ready #page-previous{grid-column:1;justify-self:start;display:inline-flex;align-items:center;gap:9px;min-height:44px;padding:5px 0;font-size:14px;line-height:1.5;color:var(--muted);transform-origin:left center;transition:color .25s,transform .55s cubic-bezier(.2,1.5,.3,1)}
+.deck-ready .page-next{grid-column:2;justify-self:center;transform-origin:center;transition:color .25s,transform .4s var(--ease)}
+.deck-ready #page-previous{grid-column:1;justify-self:start;display:inline-flex;align-items:center;gap:9px;min-height:44px;padding:5px 0;font-size:14px;line-height:1.5;color:var(--muted);transform-origin:left center;transition:color .25s,transform .4s var(--ease)}
 #page-previous-arrow{display:inline-block;font-size:20px;line-height:1}
-.deck-ready :is(.page-next,.page-previous):focus-visible{color:var(--olive);transform:scale(1.28)}
-.deck-ready .page-next:focus-visible{transform:translateY(-10px) scale(1.28)}
-.page-next:focus-visible #page-next-arrow{animation:next-cue .95s linear 1}
-.page-previous:focus-visible #page-previous-arrow{animation:previous-cue .95s linear 1}
+.deck-ready :is(.page-next,.page-previous):focus-visible{color:var(--olive);transform:scale(1.06)}
+.page-next:focus-visible #page-next-arrow{animation:next-cue .42s var(--ease) 2}
+.page-previous:focus-visible #page-previous-arrow{animation:previous-cue .42s var(--ease) 2}
 @media(hover:hover){
- .deck-ready :is(.page-next,.page-previous):hover{color:var(--olive);transform:scale(1.28)}
- .deck-ready .page-next:hover{transform:translateY(-10px) scale(1.28)}
- .page-next:hover #page-next-arrow{animation:next-cue .95s linear 1}
- .page-previous:hover #page-previous-arrow{animation:previous-cue .95s linear 1}
+ .deck-ready :is(.page-next,.page-previous):hover{color:var(--olive);transform:scale(1.06)}
+ .page-next:hover #page-next-arrow{animation:next-cue .42s var(--ease) 2}
+ .page-previous:hover #page-previous-arrow{animation:previous-cue .42s var(--ease) 2}
 }
-@keyframes next-cue{0%,48%,100%{transform:translateY(0);animation-timing-function:cubic-bezier(.22,1,.36,1)}24%{transform:translateY(14px);animation-timing-function:cubic-bezier(.65,0,.35,1)}72%{transform:translateY(3.5px);animation-timing-function:cubic-bezier(.65,0,.35,1)}}
-@keyframes previous-cue{0%,48%,100%{transform:translateY(0);animation-timing-function:cubic-bezier(.22,1,.36,1)}24%{transform:translateY(-14px);animation-timing-function:cubic-bezier(.65,0,.35,1)}72%{transform:translateY(-3.5px);animation-timing-function:cubic-bezier(.65,0,.35,1)}}
+@keyframes next-cue{0%,100%{transform:translateY(0)}45%{transform:translateY(6px)}}
+@keyframes previous-cue{0%,100%{transform:translateY(0)}45%{transform:translateY(-6px)}}
 @media(max-width:600px){.deck-ready #page-navigation{gap:4px}.deck-ready #page-previous{font-size:13px;gap:6px}}
 @media(prefers-reduced-motion:reduce){.deck-ready :is(.page-next,.page-previous){transform:none!important}}
