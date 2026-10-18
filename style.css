@@ -111,3 +111,6 @@ body.deck-ready{background:#fff}
 @keyframes previous-cue{0%,48%,100%{transform:translateY(0);animation-timing-function:var(--ease)}24%{transform:translateY(calc(-1 * var(--arrow-travel-first)));animation-timing-function:cubic-bezier(.65,0,.35,1)}72%{transform:translateY(calc(-1 * var(--arrow-travel-second)));animation-timing-function:cubic-bezier(.65,0,.35,1)}}
 @media(max-width:600px){.deck-ready #page-navigation{gap:4px}.deck-ready #page-previous{font-size:13px;gap:6px}}
 @media(prefers-reduced-motion:reduce){.deck-ready :is(.page-next,.page-previous){transform:none!important}}
+
+/* The experiment summary is one concise statement. */
+.deck-ready .experiments .findings{grid-template-columns:1fr}

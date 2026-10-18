@@ -19,7 +19,7 @@ The introductory 3D scene rotates automatically. Drag it (or use arrow keys) to 
 
 **Actout:** send the current embedding into the next module, drag it, rotate it with playback or arrow keys, inspect five axes, and change endpoint temperatures. Signed cosine similarity, normalized weights, temperature, and illustrative token probabilities follow Equations 3 and the temperature softmax.
 
-**Experiments:** compare the three main benchmarks in a compact table and review the geometry ablation and task-only boundary.
+**Experiments:** compare the three main benchmarks in a compact table, followed by one sentence summarizing the reported result.
 
 ## Style comparison
 

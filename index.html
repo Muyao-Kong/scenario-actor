@@ -21,7 +21,7 @@
   <meta name="citation_pdf_url" content="https://arxiv.org/pdf/2610.18820">
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <link rel="stylesheet" href="assets/katex/katex.min.css">
-  <link rel="stylesheet" href="style.css?v=deck8">
+  <link rel="stylesheet" href="style.css?v=experiment-summary1">
   <script defer src="assets/katex/katex.min.js"></script>
   <script type="module" src="app.js?v=actout-all-axes1"></script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Scenario-Actor","url":"https://muyao-kong.github.io/scenario-actor/","description":"Interactive visualization of scenario embeddings and scenario-adaptive sampling temperature.","about":{"@type":"ScholarlyArticle","name":"Read the Room Before Your Model Generates","url":"https://arxiv.org/abs/2610.18820","author":[{"@type":"Person","name":"Muyao Kong"},{"@type":"Person","name":"Zhihao Lin"}]}}</script>
@@ -82,7 +82,7 @@
           <div class="endpoint-title"><span>Endpoint temperatures</span><button id="restore-endpoints" class="text-button">Restore</button></div>
           <div class="endpoint-control"><label for="tau-plus"><span id="positive-endpoint">Rigorous</span><span data-math="\tau_i^+"></span><output id="tau-plus-value">0.30</output></label><input type="range" min="0.3" max="1.5" step="0.025" id="tau-plus" value="0.3"></div>
           <div class="endpoint-control"><label for="tau-minus"><span id="negative-endpoint">Brainstorming</span><span data-math="\tau_i^-"></span><output id="tau-minus-value">1.40</output></label><input type="range" min="0.3" max="1.5" step="0.025" id="tau-minus" value="1.4"></div>
-          <div class="temperature-readout"><span>Temperature (all axes) <span data-math="T"></span></span><output id="temperature-value">0.850</output></div>
+          <div class="temperature-readout"><span>Temperature <span data-math="T"></span></span><output id="temperature-value">0.850</output></div>
           <p class="note" id="actout-note" hidden></p>
         </aside>
       </div>
@@ -97,7 +97,7 @@
 <section id="experiments" class="experiments wrap story-card" data-paper-page="Experiments" aria-labelledby="experiment-title">
   <div class="section-heading"><h2 id="experiment-title">Experiments</h2><p>Llama-3.1-8B-Instruct · selected baselines from Table 1</p></div>
   <div class="table-scroll"><table><thead><tr><th scope="col">Method</th><th scope="col">AgentSense<br><span>Goal completion</span></th><th scope="col">AlpacaEval<br><span>LC-WR (%)</span></th><th scope="col">MT-Bench<br><span>GPT-4 score</span></th></tr></thead><tbody id="results-table"></tbody></table></div>
-  <div class="findings"><p><strong>Geometry ablation.</strong> AlpacaEval LC-WR is 30.03% with geometric interpolation and 27.10% with class-conditioned temperature lookup. <a href="https://arxiv.org/html/2610.18820v1#S4.SS4" target="_blank" rel="noopener">Table 6 ↗</a></p><p><strong>Task-only setting.</strong> On GSM8K, accuracy is 65.28% for Scenario-Actor and 77.18% for greedy decoding. Results are established for one model and the nine-label, five-axis taxonomy. <a href="https://arxiv.org/html/2610.18820v1#S4.SS3" target="_blank" rel="noopener">Table 3 ↗</a></p></div>
+  <div class="findings"><p>Scenario-Actor achieves the highest scores on all three benchmarks in Table 1.</p></div>
 </section>
 <section class="paper-section wrap story-card" id="paper" data-paper-page="Paper" aria-labelledby="paper-title">
   <div class="paper-copy"><h2 id="paper-title">Read the room,<br><em>Share the room</em></h2><p class="paper-title">Read the Room Before Your Model Generates</p><p class="authors">Muyao Kong · Zhihao Lin <span>2026</span></p><div class="paper-actions"><a class="paper-button" href="https://arxiv.org/abs/2610.18820" target="_blank" rel="noopener">Read on arXiv <span>↗</span></a></div><details class="citation-fallback"><summary>BibTeX</summary><div class="citation-panel"><div class="citation-toolbar"><output id="copy-status" class="note" aria-live="polite"></output><button class="text-button" id="copy-citation">Copy</button></div><pre id="bibtex">@article{kong2026read,
