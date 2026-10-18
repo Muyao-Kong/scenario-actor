@@ -117,7 +117,7 @@ function drawActout(){
  const temp=out.temperature;$('#temperature-value').textContent=temp===null?'—':temp.toFixed(3);
  $('#axis-contributions').innerHTML=out.axes.map((a,i)=>`<button class="contribution ${i===state.selectedAxis?'selected':''}" data-axis="${i}" title="${a.name}: weight ${(a.weight*100).toFixed(1)}%; axis temperature ${a.estimate.toFixed(3)}; contribution to T ${(a.weight*a.estimate).toFixed(3)}"><div><span>${a.name}</span><span>${(a.weight*100).toFixed(0)}%</span></div><div class="bar"><i style="width:${a.weight*100}%;background:${i===state.selectedAxis?'#5e7699':'#bdc8b1'}"></i></div></button>`).join('');
  $('#actout-note').hidden=state.selectedAxis!==2;
- $('#actout-note').textContent='Non-adversarial: mean of the other eight centroids. Its temperature (0.875) is a demo convention; Table 2 does not specify it.';
+ $('#actout-note').textContent='Non-adversarial: mean of the other eight centroids.';
  const zs=[3.2,2.7,2.3,1.6,.9],names=['“the”','“a”','“this”','“one”','“our”'];const probs=zs.map(z=>Math.exp((z-3.2)/(temp||1)));const total=probs.reduce((a,b)=>a+b,0);
  $('#token-bars').innerHTML=probs.map((v,i)=>`<div class="token-bar"><output>${(v/total*100).toFixed(1)}%</output><i style="height:${v/total*92}%"></i><span>${names[i]}</span></div>`).join('');
 }
