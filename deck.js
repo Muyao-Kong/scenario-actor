@@ -24,7 +24,7 @@ export function initPaperDeck(onChange=()=>{}){
  function watchContent(page,direction,animate){
   seen=new WeakSet();
   revealDirection=direction;
-  entryDelay=animate?120:0;
+  entryDelay=animate?380:0;
   if(reduced.matches||!('IntersectionObserver' in window))return;
   observer=new IntersectionObserver(entries=>{
    let order=0;
@@ -32,9 +32,9 @@ export function initPaperDeck(onChange=()=>{}){
     if(!isIntersecting||seen.has(target)||page!==pages[current]||target.closest('[hidden]'))return;
     seen.add(target);
     const animation=target.animate([
-     {opacity:0,transform:`translateY(${revealDirection*28}px)`},
+     {opacity:0,transform:`translateY(${revealDirection*112}px)`},
      {opacity:1,transform:'translateY(0)'}
-    ],{duration:620,delay:entryDelay+Math.min(order++,4)*45,easing:'cubic-bezier(.16,1,.3,1)',fill:'backwards'});
+    ],{duration:940,delay:entryDelay+Math.min(order++,4)*65,easing:'cubic-bezier(.16,1.2,.3,1)',fill:'backwards'});
     reveals.set(target,animation);
     animation.finished.then(()=>reveals.delete(target)).catch(()=>{});
    });
@@ -98,7 +98,7 @@ export function initPaperDeck(onChange=()=>{}){
   watchContent(to,direction,!!from&&animate);
 
   if(from&&animate&&!reduced.matches){
-   const timing={duration:680,easing:'cubic-bezier(.22,1,.36,1)'};
+   const timing={duration:960,easing:'cubic-bezier(.8,0,.12,1)'};
    from.animate([{transform:'translateY(0)',opacity:1},{transform:`translateY(${-direction*108}%)`,opacity:.35}],timing);
    const entering=to.animate([{transform:`translateY(${direction*108}%)`,opacity:.35},{transform:'translateY(0)',opacity:1}],timing);
    entering.finished.then(()=>{if(sequence===transition)from.hidden=true;}).catch(()=>{});
