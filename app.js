@@ -100,7 +100,13 @@ function drawActout(){
  let s=base('act',true);
 
  out.axes.forEach((a,i)=>{const v=unit(a.vector),focus=i===state.selectedAxis;s+=line(scale(v,-1.13),scale(v,1.13),focus?'#5e7699':'#cbd2c4',focus?1.7:.8,`opacity="${focus?1:.65}" marker-end="url(#act-arrow)"`);if(focus){s+=diamond(a.start,'#a5b09c')+diamond(a.end,'#a5b09c');s+=ml(scale(v,1.17),'\\hat{u}_i',70,[v[0]<0?-40:6,-19]);s+=ml(scale(v,-1.17),'-\\hat{u}_i',70,[v[0]>0?-58:5,-19]);}});
- const projection=scale(u,dot(sn,u));s+=line(sn,projection,'#b4bca3',1.2,'stroke-dasharray="4 4"')+circle(projection,3,'#5e7699');
+ // Every axis contributes to T; selection only highlights one axis for inspection.
+ out.axes.forEach((a,i)=>{
+  const projection=scale(unit(a.vector),a.rho),focus=i===state.selectedAxis,color=focus?'#5e7699':'#9da995';
+  s+=`<g class="axis-projection" data-projection-axis="${i}"><title>${a.name}: signed cosine ${a.rho.toFixed(3)}</title>`;
+  s+=line(sn,projection,color,focus?1.2:.9,`stroke-dasharray="4 4" opacity="${focus?1:.65}"`);
+  s+=line([0,0,0],projection,color,focus?1.8:1.2,`opacity="${focus?1:.8}" marker-end="url(#act-arrow)"`)+circle(projection,focus?3:2.4,color)+'</g>';
+ });
  s+=`<path d="${arc(u,sn,.3)}" stroke="#5e7699" stroke-width="1.2" fill="none"/>`;
  const midpoint=angleArc(u,sn,.4)[18];s+=ml(midpoint,'\\theta_i',55,[-7,-16]);
  s+=line([0,0,0],sn,'#d47747',1.7,'marker-end="url(#act-arrow)"')+circle(sn,5,'#d47747','opacity=".18"');
@@ -109,7 +115,7 @@ function drawActout(){
  sizePlot($('#actout-space'));$('#actout-space').innerHTML=s;
  $('#rho-value').textContent=(selected.rho>=0?'+':'')+selected.rho.toFixed(3);$('#angle-caption').textContent=`θ = ${(Math.acos(selected.rho)*180/Math.PI).toFixed(1)}°`;
  const temp=out.temperature;$('#temperature-value').textContent=temp===null?'—':temp.toFixed(3);
- $('#axis-contributions').innerHTML=out.axes.map((a,i)=>`<button class="contribution ${i===state.selectedAxis?'selected':''}" data-axis="${i}" title="Inspect ${a.name}; normalized weight ${(a.weight*100).toFixed(1)}%"><div><span>${a.name}</span><span>${(a.weight*100).toFixed(0)}%</span></div><div class="bar"><i style="width:${a.weight*100}%;background:${i===state.selectedAxis?'#5e7699':'#bdc8b1'}"></i></div></button>`).join('');
+ $('#axis-contributions').innerHTML=out.axes.map((a,i)=>`<button class="contribution ${i===state.selectedAxis?'selected':''}" data-axis="${i}" title="${a.name}: weight ${(a.weight*100).toFixed(1)}%; axis temperature ${a.estimate.toFixed(3)}; contribution to T ${(a.weight*a.estimate).toFixed(3)}"><div><span>${a.name}</span><span>${(a.weight*100).toFixed(0)}%</span></div><div class="bar"><i style="width:${a.weight*100}%;background:${i===state.selectedAxis?'#5e7699':'#bdc8b1'}"></i></div></button>`).join('');
  $('#actout-note').hidden=state.selectedAxis!==2;
  $('#actout-note').textContent='Non-adversarial: mean of the other eight centroids. Its temperature (0.875) is a demo convention; Table 2 does not specify it.';
  const zs=[3.2,2.7,2.3,1.6,.9],names=['“the”','“a”','“this”','“one”','“our”'];const probs=zs.map(z=>Math.exp((z-3.2)/(temp||1)));const total=probs.reduce((a,b)=>a+b,0);

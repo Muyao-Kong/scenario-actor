@@ -8,6 +8,19 @@ test('orthogonal axes contribute zero; weights are normalized',()=>{const axes=[
 test('cosine temperature is invariant to positive vector scaling',()=>{const axes=[{vector:[2,1],plus:.3,minus:1.4},{vector:[1,-3],plus:1,minus:.65}];close(actout([.3,.5],axes).temperature,actout([3,5],axes).temperature);});
 test('undefined direction returns no temperature',()=>{assert.equal(actout([0,0],[{vector:[1,0],plus:.3,minus:1.4}]).temperature,null);assert.equal(actout([1,0],[{vector:[0,1],plus:.3,minus:1.4}]).temperature,null);});
 test('multi-axis interpolation stays in the configured endpoint range',()=>{for(let k=0;k<100;k++){const a=actout([Math.cos(k),Math.sin(k)],[{vector:[1,.4],plus:.3,minus:1.5},{vector:[-.5,1],plus:.65,minus:1}]);assert.ok(a.temperature>=.3&&a.temperature<=1.5);}});
+test('Actout aggregates every axis, including non-orthogonal directions',()=>{
+ const axes=[{vector:[1,0,0],plus:1,minus:2},{vector:[0,1,0],plus:.4,minus:1.4},{vector:[1,1,0],plus:.8,minus:1.6},{vector:[0,0,1],plus:.3,minus:1.5},{vector:[1,0,1],plus:.3,minus:1.5}];
+ const r=7/(5*Math.sqrt(2)),q=3/(5*Math.sqrt(2)),denominator=.6+.8+r+q;
+ const expected=(.6*1.2+.8*.5+r*(1.2-.4*r)+q*(.9-.6*q))/denominator;
+ const out=actout([3,4,0],axes);
+ close(out.temperature,expected);
+ close(out.temperature,actout([3,4,0],[...axes].reverse()).temperature);
+ // Editing any contributing axis changes the aggregate by its normalized weight.
+ axes.forEach((axis,i)=>{
+  const edited=axes.map((a,j)=>j===i?{...a,plus:a.plus+.1,minus:a.minus+.1}:a);
+  close(actout([3,4,0],edited).temperature-expected,out.axes[i].weight*.1);
+ });
+});
 test('toy training updates model parameters and embeddings and reduces loss',()=>{const frames=trainingRun();const a=frames[0],b=frames.at(-1);assert.ok(b.loss<a.loss*.1);assert.notDeepEqual(a.model.W,b.model.W);assert.notDeepEqual(a.model.U,b.model.U);assert.ok(dist(a.centroids[0],b.centroids[0])>.01);for(const f of frames)for(const p of f.points)assert.ok(p.p.every(Number.isFinite));});
 test('training frames and inference use the same RNN state',()=>{const f=trainingRun().at(-1);assert.deepEqual(f.chosen[0][0],forward(f.model,inputs(0,0)).at(-1));});
 test('the five axes use the specified centroid pairs, including non-adversarial mean',()=>{const centroids=labels.map(l=>l.pos);const axes=makeAxes(centroids);assert.equal(axes.length,5);assert.deepEqual(axes[0].vector,centroids[2].map((x,i)=>x-centroids[3][i]));const mean=centroids.slice(0,8).reduce((s,p)=>s.map((x,i)=>x+p[i]/8),centroids[0].map(()=>0));assert.deepEqual(axes[2].start,mean);close(axes[2].minus,.875);});

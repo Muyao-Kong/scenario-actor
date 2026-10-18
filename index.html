@@ -23,7 +23,7 @@
   <link rel="stylesheet" href="assets/katex/katex.min.css">
   <link rel="stylesheet" href="style.css?v=deck8">
   <script defer src="assets/katex/katex.min.js"></script>
-  <script type="module" src="app.js?v=deck6"></script>
+  <script type="module" src="app.js?v=actout-all-axes1"></script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Scenario-Actor","url":"https://muyao-kong.github.io/scenario-actor/","description":"Interactive visualization of scenario embeddings and scenario-adaptive sampling temperature.","about":{"@type":"ScholarlyArticle","name":"Read the Room Before Your Model Generates","url":"https://arxiv.org/abs/2610.18820","author":[{"@type":"Person","name":"Muyao Kong"},{"@type":"Person","name":"Zhihao Lin"}]}}</script>
 </head>
 <body>
@@ -71,18 +71,18 @@
       <div class="lab-body">
         <div class="canvas-column">
           <div class="plot-toolbar"><p>Drag the embedding to move it.</p></div>
-          <div class="plot actout-plot"><svg id="actout-space" viewBox="0 0 760 470" role="img" tabindex="0" aria-label="Three-dimensional scenario embedding, axis direction, angle, and orthogonal projection. Drag empty space to rotate."></svg></div>
+          <div class="plot actout-plot"><svg id="actout-space" viewBox="0 0 760 470" role="img" tabindex="0" aria-label="Three-dimensional scenario embedding and projections onto all five scenario axes; the inspected axis is highlighted. Drag empty space to rotate."></svg></div>
           <div class="actout-transport"><button class="play-button" id="orbit" aria-label="Animate scenario embedding">▶</button><span>Rotate embedding</span></div>
           <div class="axis-contributions" id="axis-contributions" aria-label="Normalized axis weights"></div>
         </div>
         <aside class="controls">
-          <h3>Temperature selection</h3><p>Endpoint temperatures are interpolated by alignment with each scenario axis.</p>
-          <label class="field-label" for="axis-select">Scenario axis</label><select id="axis-select"></select>
+          <h3>Temperature selection</h3><p>Interpolate on every axis, then combine using normalized absolute cosine weights.</p>
+          <label class="field-label" for="axis-select">Inspect axis</label><select id="axis-select"></select>
           <div class="cosine-readout"><span data-math="\hat{s}_{\mathcal P}^{\top}\hat{u}_i"></span><output id="rho-value">0.000</output><span id="angle-caption">θ = 90°</span></div>
           <div class="endpoint-title"><span>Endpoint temperatures</span><button id="restore-endpoints" class="text-button">Restore</button></div>
           <div class="endpoint-control"><label for="tau-plus"><span id="positive-endpoint">Rigorous</span><span data-math="\tau_i^+"></span><output id="tau-plus-value">0.30</output></label><input type="range" min="0.3" max="1.5" step="0.025" id="tau-plus" value="0.3"></div>
           <div class="endpoint-control"><label for="tau-minus"><span id="negative-endpoint">Brainstorming</span><span data-math="\tau_i^-"></span><output id="tau-minus-value">1.40</output></label><input type="range" min="0.3" max="1.5" step="0.025" id="tau-minus" value="1.4"></div>
-          <div class="temperature-readout"><span>Selected temperature <span data-math="T"></span></span><output id="temperature-value">0.850</output></div>
+          <div class="temperature-readout"><span>Temperature (all axes) <span data-math="T"></span></span><output id="temperature-value">0.850</output></div>
           <p class="note" id="actout-note" hidden></p>
         </aside>
       </div>
