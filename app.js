@@ -1,4 +1,4 @@
-import {initPaperDeck} from './deck.js?v=deck2';
+import {initPaperDeck} from './deck.js?v=deck3';
 import {add,labels,results,trainingRun,forward,inputs,makeAxes,actout,unit,norm,dot,scale,sub,dist,mix,smooth,triplet} from './geometry.js?v=3d5';
 import {camera,project,spherePoint,angleArc,rotateVector} from './scene3d.js?v=3d5';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];

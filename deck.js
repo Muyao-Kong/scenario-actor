@@ -3,12 +3,54 @@ export function initPaperDeck(onChange=()=>{}){
  const pages=[...document.querySelectorAll('[data-paper-page]')];
  const stage=document.querySelector('#paper-deck');
  const navigation=document.querySelector('#page-navigation');
+ const previous=document.querySelector('#page-previous');
+ const previousLabel=document.querySelector('#page-previous-label');
  const next=document.querySelector('#page-next');
  const nextLabel=document.querySelector('#page-next-label');
  const nextArrow=document.querySelector('#page-next-arrow');
  const announcement=document.querySelector('#page-announcement');
  const reduced=matchMedia('(prefers-reduced-motion: reduce)');
+ const revealSelector='.hero-copy > *, .hero-figure, .section-heading, .lab-top, .plot-toolbar, .plot, .transport, .actout-transport, .axis-contributions, .controls > *, .equation-strip, .legend, .sampling-details, .table-scroll, .findings > p, .paper-copy > *, .qr-block';
+ const reveals=new Map();
+ let observer,seen=new WeakSet(),revealDirection=1,entryDelay=0;
  let current=-1,transition=0;
+
+ function stopReveals(){
+  observer?.disconnect();
+  reveals.forEach(animation=>animation.cancel());
+  reveals.clear();
+ }
+
+ function watchContent(page,direction,animate){
+  seen=new WeakSet();
+  revealDirection=direction;
+  entryDelay=animate?120:0;
+  if(reduced.matches||!('IntersectionObserver' in window))return;
+  observer=new IntersectionObserver(entries=>{
+   let order=0;
+   entries.forEach(({target,isIntersecting})=>{
+    if(!isIntersecting||seen.has(target)||page!==pages[current]||target.closest('[hidden]'))return;
+    seen.add(target);
+    const animation=target.animate([
+     {opacity:0,transform:`translateY(${revealDirection*28}px)`},
+     {opacity:1,transform:'translateY(0)'}
+    ],{duration:620,delay:entryDelay+Math.min(order++,4)*45,easing:'cubic-bezier(.16,1,.3,1)',fill:'backwards'});
+    reveals.set(target,animation);
+    animation.finished.then(()=>reveals.delete(target)).catch(()=>{});
+   });
+   entryDelay=0;
+  },{root:page,threshold:.08});
+  page.querySelectorAll(revealSelector).forEach(element=>observer.observe(element));
+ }
+ pages.forEach(page=>{
+  let lastScroll=page.scrollTop;
+  page.addEventListener('scroll',()=>{
+   const delta=page.scrollTop-lastScroll;
+   if(Math.abs(delta)>1)revealDirection=delta>0?1:-1;
+   lastScroll=page.scrollTop;
+  },{passive:true});
+ });
+ reduced.addEventListener('change',()=>{if(reduced.matches){stopReveals();pages.forEach(page=>page.getAnimations().forEach(animation=>animation.finish()));}});
 
  function destination(hash){
   let id;
@@ -23,7 +65,8 @@ export function initPaperDeck(onChange=()=>{}){
   if(index===current)return;
   const from=pages[current],to=pages[index],direction=index>current?1:-1;
   const sequence=++transition;
-  // Cancel any interrupted transition before establishing the next pair of cards.
+  stopReveals();
+  // Cancel interrupted transitions before establishing the next pair of pages.
   pages.forEach(page=>{
    page.getAnimations().forEach(animation=>animation.cancel());
    const active=page===to;
@@ -33,6 +76,12 @@ export function initPaperDeck(onChange=()=>{}){
   });
   current=index;
   document.body.dataset.activePage=to.id;
+  previous.hidden=index===0;
+  if(index>0){
+   previous.href=`#${pages[index-1].id}`;
+   previousLabel.textContent=pages[index-1].dataset.paperPage;
+   previous.setAttribute('aria-label',`Previous page: ${previousLabel.textContent}`);
+  }
   const following=pages[index+1]||pages[0];
   next.href=`#${following.id}`;
   nextLabel.textContent=index===pages.length-1?'Back to top':following.dataset.paperPage;
@@ -46,6 +95,7 @@ export function initPaperDeck(onChange=()=>{}){
   if(record)history.pushState({paperPage:to.id},'',`#${to.id}`);
   onChange({page:to.id,target,previous:from?.id});
   if(focus){const heading=to.querySelector('h1,h2');heading.tabIndex=-1;heading.focus({preventScroll:true});}
+  watchContent(to,direction,!!from&&animate);
 
   if(from&&animate&&!reduced.matches){
    const timing={duration:680,easing:'cubic-bezier(.22,1,.36,1)'};
