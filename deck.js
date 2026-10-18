@@ -3,9 +3,9 @@ export function initPaperDeck(onChange=()=>{}){
  const pages=[...document.querySelectorAll('[data-paper-page]')];
  const stage=document.querySelector('#paper-deck');
  const navigation=document.querySelector('#page-navigation');
- const previous=document.querySelector('#page-previous');
  const next=document.querySelector('#page-next');
- const counter=document.querySelector('#page-count');
+ const nextLabel=document.querySelector('#page-next-label');
+ const nextArrow=document.querySelector('#page-next-arrow');
  const announcement=document.querySelector('#page-announcement');
  const reduced=matchMedia('(prefers-reduced-motion: reduce)');
  let current=-1,transition=0;
@@ -33,13 +33,11 @@ export function initPaperDeck(onChange=()=>{}){
   });
   current=index;
   document.body.dataset.activePage=to.id;
-  previous.hidden=index===0;
-  if(index>0){previous.href=`#${pages[index-1].id}`;previous.textContent=pages[index-1].dataset.paperPage;previous.setAttribute('aria-label',`Previous page: ${previous.textContent}`);}
   const following=pages[index+1]||pages[0];
   next.href=`#${following.id}`;
-  next.textContent=index===pages.length-1?'Back to top':following.dataset.paperPage;
-  next.setAttribute('aria-label',index===pages.length-1?'Back to top':`Next page: ${next.textContent}`);
-  counter.textContent=`${String(index+1).padStart(2,'0')} / ${String(pages.length).padStart(2,'0')}`;
+  nextLabel.textContent=index===pages.length-1?'Back to top':following.dataset.paperPage;
+  nextArrow.hidden=index===pages.length-1;
+  next.setAttribute('aria-label',index===pages.length-1?'Back to top':`Next page: ${nextLabel.textContent}`);
   announcement.textContent=`${to.dataset.paperPage}, page ${index+1} of ${pages.length}`;
   document.querySelectorAll('.site-header a[href^="#"]').forEach(link=>{
    if(destination(link.hash)?.index===index)link.setAttribute('aria-current','page');
@@ -72,6 +70,6 @@ export function initPaperDeck(onChange=()=>{}){
  navigation.hidden=false;
  const initial=destination(location.hash)||{index:0};
  show(initial.index,{animate:false,record:false,focus:false,target:initial.target});
- stage.setAttribute('aria-roledescription','chapter cards');
+ stage.setAttribute('aria-roledescription','chapters');
  return {get activePage(){return pages[current].id;}};
 }

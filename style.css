@@ -64,3 +64,32 @@ body.deck-ready{--header-height:100px;height:100vh;height:100dvh;overflow:hidden
 @media(max-width:760px){.deck-ready .hero{grid-template-columns:1fr;align-content:start;gap:22px}.deck-ready .hero-copy{max-width:500px}.deck-ready .hero-figure{max-width:500px;width:100%;justify-self:center}.deck-ready .paper-section{grid-template-columns:1fr;align-content:start;gap:28px}.deck-ready .qr-block{justify-self:start;align-items:flex-start}.deck-ready .section-heading{gap:9px}}
 @media(max-width:600px){body.deck-ready{--header-height:68px;grid-template-rows:var(--header-height) minmax(0,1fr) 68px}.deck-ready #paper-deck{width:calc(100% - 24px);margin-top:12px;border-radius:8px}.deck-ready .story-card{padding:24px 20px;border-radius:8px}.deck-ready .hero h1{font-size:clamp(32px,9.7vw,41px)}.deck-ready .hero-description{margin-bottom:20px}.deck-ready .hero .authors{margin-top:23px}.deck-ready .hero{gap:18px}.deck-ready .hero-figure{max-width:380px}.deck-ready .lab-section,.deck-ready .experiments{padding:21px 16px}.deck-ready #page-navigation{width:calc(100% - 32px);height:68px;gap:12px;padding:0;font-size:13px}.page-next{font-size:14px;min-width:103px;padding:9px 14px}.page-counter{font-size:12px;letter-spacing:.4px}.deck-ready .paper-section{gap:28px}}
 .deck-ready .story-card :is(h1,h2):focus{outline:none}
+/* Open chapter pages: typography and whitespace replace decorative containers. */
+body.deck-ready{background:#fff}
+.deck-ready #paper-deck{border-radius:0}
+.deck-ready .story-card{border:0;border-radius:0;box-shadow:none;padding:30px 0;background:#fff}
+.deck-ready .lab-section,.deck-ready .experiments{padding:24px 0}
+.deck-ready #page-navigation{display:flex;justify-content:center;align-items:center;gap:0;padding:0}
+.deck-ready .page-next{display:flex;flex-direction:column;gap:1px;min-width:0;padding:5px 18px;border:0;border-radius:0;background:none;color:var(--ink);font-size:15px;line-height:1.5;transition:color .25s}
+.deck-ready .page-next:hover{background:none;color:var(--olive)}
+#page-next-arrow{font-size:23px;line-height:1.15;font-weight:400}
+.deck-ready .lab-shell{border:0;border-radius:0;overflow:visible}
+.deck-ready .lab-top{padding:0;border-bottom:1px solid var(--line)}
+.deck-ready .lab-body{grid-template-columns:minmax(0,1fr) 280px;gap:36px}
+.deck-ready .controls{background:none;border:0;padding:22px 0}
+.deck-ready .prompt-box{border:0;padding-left:0}
+.deck-ready select{border:0;border-bottom:1px solid #ccd5c5;border-radius:0;padding:9px 0;background-color:transparent}
+.deck-ready .metrics{border:0;padding-top:0;margin-top:22px}
+.deck-ready .endpoint-title,.deck-ready .temperature-readout{border:0;padding-top:0}
+.deck-ready .play-button{border:0;border-radius:0;background:none;font-size:14px}
+.deck-ready .transport,.deck-ready .actout-transport{border:0}
+.deck-ready .legend,.deck-ready .sampling-details{border:0}
+.deck-ready .citation-panel{border:0;border-radius:0;background:none;padding:0}
+.deck-ready .paper-button{padding:0;gap:16px;border:0;border-radius:0;background:none;color:var(--ink)}
+.deck-ready .paper-button:hover{background:none;color:var(--olive)}
+.deck-ready .experiments tr.ours{background:none}
+.deck-ready .experiments tr.ours th{border-left:0}
+.deck-ready .experiments thead th{background:none;border-top:0}
+@media(max-width:1000px){.deck-ready .story-card{padding:27px 0}.deck-ready .lab-body{grid-template-columns:minmax(0,1fr) 255px;gap:26px}}
+@media(max-width:760px){.deck-ready .lab-body{grid-template-columns:1fr;gap:0}.deck-ready .controls{padding:22px 0 12px}.deck-ready .plot-toolbar{padding-left:0;padding-right:0}}
+@media(max-width:600px){.deck-ready .story-card{padding:24px 8px;border-radius:0}.deck-ready .lab-section,.deck-ready .experiments{padding:21px 8px}.deck-ready .page-next{padding:4px 16px;font-size:14px}.deck-ready .controls{padding:20px 0 12px}.deck-ready .paper-button{padding:0}.deck-ready .citation-panel{padding:0}}

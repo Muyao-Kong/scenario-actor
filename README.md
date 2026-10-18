@@ -11,7 +11,7 @@ A minimal, white-first visualization of **Read the Room Before Your Model Genera
 
 ## Explore
 
-The paper is presented as four chapter cards: Overview, Method, Experiments, and Paper. Use the bottom chapter button or the top navigation to move between cards with a smooth vertical transition. Only the current card is interactive. Long content scrolls within its card, while chapter navigation stays visible. Browser back/forward and direct chapter links work; simulation parameters, camera orientation, and progress persist when revisiting Method. Playback pauses when leaving it. Reduced-motion preferences skip chapter transitions. Without JavaScript the content remains a conventional readable document.
+The paper is presented as four full-screen chapters: Overview, Method, Experiments, and Paper. Use the centered chapter text and down arrow at the bottom, or the top navigation, to move between chapters with a smooth vertical transition. The layout has no enclosing card borders, filled navigation buttons, or boxed control panels. Only the current chapter is interactive. Long content scrolls within its chapter, while the next-chapter link stays visible. Browser back/forward and direct chapter links work; simulation parameters, camera orientation, and progress persist when revisiting Method. Playback pauses when leaving it. Reduced-motion preferences skip chapter transitions. Without JavaScript the content remains a conventional readable document.
 
 The introductory 3D scene rotates automatically. Drag it (or use arrow keys) to adjust the view; automatic rotation resumes smoothly after two idle seconds. Automatic motion respects reduced-motion preferences.
 
