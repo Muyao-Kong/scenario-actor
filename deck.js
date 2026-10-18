@@ -14,6 +14,15 @@ export function initPaperDeck(onChange=()=>{}){
  const reveals=new Map();
  let observer,seen=new WeakSet(),revealDirection=1,entryDelay=0;
  let current=-1,transition=0;
+ const tapTimers=new WeakMap();
+ function tapCue(link){
+  if(reduced.matches||!matchMedia('(hover: none), (max-width: 600px)').matches)return;
+  clearTimeout(tapTimers.get(link));
+  link.classList.remove('tap-cue');
+  void link.offsetWidth;
+  link.classList.add('tap-cue');
+  tapTimers.set(link,setTimeout(()=>link.classList.remove('tap-cue'),860));
+ }
 
  function stopReveals(){
   observer?.disconnect();
@@ -111,6 +120,7 @@ export function initPaperDeck(onChange=()=>{}){
   const dest=destination(link.hash);
   if(!dest)return;
   event.preventDefault();
+  if(link===next||link===previous)tapCue(link);
   show(dest.index,{target:dest.target});
  });
  const restore=()=>{const dest=destination(location.hash)||{index:0};show(dest.index,{record:false,target:dest.target});};

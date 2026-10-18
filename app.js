@@ -1,4 +1,4 @@
-import {initPaperDeck} from './deck.js?v=deck6';
+import {initPaperDeck} from './deck.js?v=mobile1';
 import {add,labels,results,trainingRun,forward,inputs,makeAxes,actout,unit,norm,dot,scale,sub,dist,mix,smooth,triplet} from './geometry.js?v=3d5';
 import {camera,project,spherePoint,angleArc,rotateVector} from './scene3d.js?v=3d5';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
@@ -7,20 +7,33 @@ let frames=trainingRun(), last=0, heroDragging=false, heroResumeAt=0, heroSpeed=
 let paperDeck=null;
 const mathCache=new Map();
 function math(tex,display=false){const key=`${display}:${tex}`;if(!mathCache.has(key))mathCache.set(key,window.katex.renderToString(tex,{displayMode:display,throwOnError:true,output:'htmlAndMathml',strict:'ignore'}));return mathCache.get(key);}
-function renderMath(root=document){root.querySelectorAll('[data-math]').forEach(el=>el.innerHTML=math(el.dataset.math,!!el.closest('.equation-strip,.equation-definition,.sampling-row')));}
+function renderMath(root=document){root.querySelectorAll('[data-math]').forEach(el=>el.innerHTML=math(compactMath()&&el.dataset.mathMobile?el.dataset.mathMobile:el.dataset.math,!!el.closest('.equation-strip,.equation-definition,.sampling-row')));}
 const C={x:380,y:232,s:174};
 const views={train:{yaw:.65,pitch:.38},act:{yaw:.65,pitch:.38},hero:{yaw:.65,pitch:.38}};
 const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
-let viewCamera=camera();
+let viewCamera=camera(),activeView='train';
 const narrow=()=>matchMedia('(max-width:600px)').matches;
-function activate(view,zoom){C.s=zoom;viewCamera=camera(views[view].yaw,views[view].pitch,zoom,C.x,C.y);}
+const compactMath=()=>matchMedia('(max-width:1000px)').matches;
+function activate(view,zoom){activeView=view;C.s=zoom;viewCamera=camera(views[view].yaw,views[view].pitch,zoom,C.x,C.y);}
 function sizePlot(el){el.setAttribute('viewBox',narrow()?'100 0 560 470':'0 0 760 470');}
 const xy=v=>project(v,viewCamera).slice(0,2);
 const path=ps=>ps.map((p,i)=>`${i?'L':'M'}${p.map(x=>x.toFixed(2)).join(',')}`).join(' ');
 function line(a,b,color='#cdd2c2',width=1,extra=''){return `<path d="${path([xy(a),xy(b)])}" fill="none" stroke="${color}" stroke-width="${width}" ${extra}/>`;}
 function curve(points,color,width=1,extra=''){return `<path d="${path(points.map(xy))}" fill="none" stroke="${color}" stroke-width="${width}" ${extra}/>`;}
 function circle(v,r,color,extra=''){const [x,y]=xy(v);return `<circle cx="${x}" cy="${y}" r="${r}" fill="${color}" ${extra}/>`;}
-function ml(v,tex,w=150,offset=[10,-29]){const [x,y]=xy(v);return `<foreignObject x="${x+offset[0]}" y="${y+offset[1]}" width="${w}" height="42" class="plot-label"><div xmlns="http://www.w3.org/1999/xhtml" class="math-label">${math(tex)}</div></foreignObject>`;}
+// Native SVG text keeps accents/subscripts in the same coordinate system as the scene.
+// It avoids HTML/foreignObject positioning escaping the SVG on mobile browsers.
+const xml=s=>s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
+function ml(v,tex,w=150,offset=[10,-29]){
+ const [x,y]=xy(v),font=narrow()?30:24;
+ const clean=tex.replace(/\\hat\{([a-z])\}/g,'$1̂').replace(/\\theta/g,'θ').replace(/\\mathcal\s*P/g,'𝒫');
+ const match=clean.match(/^(.*?)(?:_\{([^}]+)\}|_([^{}]+))?$/),base=match[1],sub=match[2]||match[3]||'';
+ const width=Math.max(font,Array.from(base).length*font*.65+Array.from(sub).length*font*.45);
+ const left=narrow()&&activeView!=='hero'?100:0,right=left?(left+560):760;
+ const px=Math.max(left+6,Math.min(right-width-6,x+offset[0])),py=Math.max(font+6,Math.min(452,y+offset[1]+font));
+ const subscript=xml(sub).replace(/\^([+-])/g,'<tspan baseline-shift="super" font-size="75%">$1</tspan>');
+ return `<text x="${px}" y="${py}" class="plot-label plot-math" font-size="${font}" data-latex="${xml(tex)}">${xml(base)}${sub?`<tspan baseline-shift="sub" font-size="70%">${subscript}</tspan>`:''}</text>`;
+}
 function diamond(v,color,r=4){const [x,y]=xy(v);return `<path d="M${x},${y-r}l${r},${r}l-${r},${r}l-${r},-${r}Z" fill="${color}" stroke="#fff" stroke-width="1"/>`;}
 function base(id='plot',polar=false){
  let s=`<defs><marker id="${id}-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10" fill="none" stroke="context-stroke" stroke-width="1.3"/></marker></defs>`;
@@ -86,10 +99,13 @@ function setView(view){
  $('#scenarize-legend').innerHTML=infer?'<span><i class="point-key"></i> Scenario estimate</span><span><i class="point-key similar"></i> STM contribution</span><span><i class="point-key smm"></i> SMM contribution</span><span><i class="centroid-key"></i> Class centroid</span>':'<span><i class="point-key"></i> Prompt embedding</span><span><i class="point-key similar"></i> Similar scenario</span><span><i class="point-key opposite"></i> Opposite scenario</span><span><i class="centroid-key"></i> Class centroid</span>';
  $('#control-desc').textContent=infer?'Each prompt chunk updates the scenario estimate through SMM and STM.':'The loss draws similar scenarios closer and separates opposite scenarios.';
  $('#positive-distance').previousElementSibling.textContent=infer?'First coordinate':'Similar distance²';$('#negative-distance').previousElementSibling.textContent=infer?'Second coordinate':'Opposite distance²';$('#loss-label').textContent=infer?'Vector norm':'Triplet loss';$('#next').setAttribute('aria-label',infer?'Next token step':'Next training step');
- $('#scenarize-equation').innerHTML=math(infer?'\\begin{aligned}s_t&=\\operatorname{Scenarize}(h_{p_t}^{(r)})\\\\&=\\phi(U_{\\mathrm{stm}}s_{t-1}+W_{\\mathrm{smm}}h_{p_t}^{(r)}+b)\\end{aligned}':'\\mathcal{L}=\\max\\!\\left(0,d(s_{\\mathcal P},s_{\\mathcal P^+})-d(s_{\\mathcal P},s_{\\mathcal P^-})+\\beta\\right)',true);
+ const equation=$('#scenarize-equation');
+ equation.dataset.math=infer?'\\begin{aligned}s_t&=\\operatorname{Scenarize}(h_{p_t}^{(r)})\\\\&=\\phi(U_{\\mathrm{stm}}s_{t-1}+W_{\\mathrm{smm}}h_{p_t}^{(r)}+b)\\end{aligned}':'\\mathcal{L}=\\max\\!\\left(0,d(s_{\\mathcal P},s_{\\mathcal P^+})-d(s_{\\mathcal P},s_{\\mathcal P^-})+\\beta\\right)';
+ equation.dataset.mathMobile=infer?String.raw`\begin{aligned}s_t&=\operatorname{Scenarize}(h_{p_t}^{(r)})\\&=\phi\bigl(U_{\mathrm{stm}}s_{t-1}\\&\qquad+W_{\mathrm{smm}}h_{p_t}^{(r)}+b\bigr)\end{aligned}`:String.raw`\begin{aligned}\mathcal L=\max\bigl(0,&\,d(s_{\mathcal P},s_{\mathcal P^+})\\&-d(s_{\mathcal P},s_{\mathcal P^-})+\beta\bigr)\end{aligned}`;
+ equation.innerHTML=math(compactMath()?equation.dataset.mathMobile:equation.dataset.math,true);
  $('#equation-source').textContent=infer?'Eq. 1':'Eq. 2';$('#progress').max=infer?4:160;$('#progress').step=infer?.01:1;$('#progress').setAttribute('aria-label',infer?'Prompt token step':'Training step');state.step=infer?160:0;state.token=0;drawTrain();
 }
-function setModule(module){state.module=module;state.playing=false;state.orbit=false;updatePlay();$('#orbit').textContent='▶';$('#orbit').setAttribute('aria-label','Animate scenario embedding');$$('[data-module]').forEach(b=>{const active=b.dataset.module===module;b.setAttribute('aria-selected',active);b.tabIndex=active?0:-1;});$('#panel-scenarize').hidden=module!=='scenarize';$('#panel-actout').hidden=module!=='actout';if(module==='actout'){syncEndpoints();drawActout();}else drawTrain();}
+function setModule(module){if(narrow()&&module!==state.module)$('#lab').scrollTop=0;state.module=module;state.playing=false;state.orbit=false;updatePlay();$('#orbit').textContent='▶';$('#orbit').setAttribute('aria-label','Animate scenario embedding');$$('[data-module]').forEach(b=>{const active=b.dataset.module===module;b.setAttribute('aria-selected',active);b.tabIndex=active?0:-1;});$('#panel-scenarize').hidden=module!=='scenarize';$('#panel-actout').hidden=module!=='actout';if(module==='actout'){syncEndpoints();drawActout();}else drawTrain();}
 function currentAxes(){return makeAxes(actoutFrame.centroids,state.overrides);}
 const endpointText=v=>Math.abs(v*100-Math.round(v*100))<1e-8?v.toFixed(2):v.toFixed(3);
 function syncEndpoints(){const a=currentAxes()[state.selectedAxis];$('#positive-endpoint').textContent=labels[a.a].name;$('#negative-endpoint').textContent=a.b<0?'Non-adversarial (mean)':labels[a.b].name;$('#tau-plus').value=a.plus;$('#tau-minus').value=a.minus;$('#tau-plus-value').textContent=endpointText(a.plus);$('#tau-minus-value').textContent=endpointText(a.minus);$('#axis-select').value=state.selectedAxis;}
@@ -110,8 +126,8 @@ function drawActout(){
  s+=`<path d="${arc(u,sn,.3)}" stroke="#5e7699" stroke-width="1.2" fill="none"/>`;
  const midpoint=angleArc(u,sn,.4)[18];s+=ml(midpoint,'\\theta_i',55,[-7,-16]);
  s+=line([0,0,0],sn,'#d47747',1.7,'marker-end="url(#act-arrow)"')+circle(sn,5,'#d47747','opacity=".18"');
- s+=circle(state.vector,22,'#d47747','opacity=".06"')+`<g class="drag-handle" id="embedding-handle" role="slider" tabindex="0" aria-label="3D scenario embedding. Left/right change azimuth; up/down change elevation." aria-valuemin="-180" aria-valuemax="180" aria-valuenow="${Math.round(Math.atan2(state.vector[1],state.vector[0])*180/Math.PI)}">${circle(state.vector,24,'transparent')}${circle(state.vector,7,'#d47747','stroke="white" stroke-width="2.5"')}</g>`+ml(state.vector,'s_{\\mathcal P}',75,[10,-30]);
- if(Math.abs(norm(state.vector)-1)>.12)s+=circle(sn,4,'white','stroke="#d47747" stroke-width="1.5"')+ml(sn,'\\hat{s}_{\\mathcal P}',80,[8,6]);
+ s+=circle(state.vector,22,'#d47747','opacity=".06"')+`<g class="drag-handle" id="embedding-handle" role="slider" tabindex="0" aria-label="3D scenario embedding. Left/right change azimuth; up/down change elevation." aria-valuemin="-180" aria-valuemax="180" aria-valuenow="${Math.round(Math.atan2(state.vector[1],state.vector[0])*180/Math.PI)}">${circle(state.vector,narrow()?44:24,'transparent')}${circle(state.vector,7,'#d47747','stroke="white" stroke-width="2.5"')}</g>`+ml(state.vector,'s_{\\mathcal P}',75,[10,-30]);
+ if(Math.abs(norm(state.vector)-1)>.12)s+=circle(sn,4,'white','stroke="#d47747" stroke-width="1.5"')+ml(sn,'\\hat{s}_{\\mathcal P}',80,[-75,-32]);
  sizePlot($('#actout-space'));$('#actout-space').innerHTML=s;
  $('#rho-value').textContent=(selected.rho>=0?'+':'')+selected.rho.toFixed(3);$('#angle-caption').textContent=`θ = ${(Math.acos(selected.rho)*180/Math.PI).toFixed(1)}°`;
  const temp=out.temperature;$('#temperature-value').textContent=temp===null?'—':temp.toFixed(3);
@@ -161,16 +177,24 @@ function bindScene(svg,view){
  let gesture=null;
  const repaint=()=>view==='hero'?drawHero():view==='train'?drawTrain():drawActout();
  svg.addEventListener('pointerdown',e=>{
+  if(!e.isPrimary||e.button!==0)return;
   const embedding=view==='act'&&!!e.target.closest('#embedding-handle');
   const c=camera(views[view].yaw,views[view].pitch,174);
-  gesture={x:e.clientX,y:e.clientY,yaw:views[view].yaw,pitch:views[view].pitch,embedding,hemisphere:dot(state.vector,c.depth)>=0?1:-1,radius:Math.max(.12,norm(state.vector))};
+  gesture={pointerId:e.pointerId,x:e.clientX,y:e.clientY,yaw:views[view].yaw,pitch:views[view].pitch,embedding,hemisphere:dot(state.vector,c.depth)>=0?1:-1,radius:Math.max(.12,norm(state.vector))};
+  if(embedding){
+   const r=svg.getBoundingClientRect(),p=project(state.vector,c),[left,top,width,height]=svg.getAttribute('viewBox').split(/\s+/).map(Number);
+   gesture.box={left,top,width,height};
+   gesture.offset=[p[0]-left-(e.clientX-r.left)/r.width*width,p[1]-top-(e.clientY-r.top)/r.height*height];
+  }
   if(view==='hero'){heroDragging=true;heroSpeed=0;}if(embedding)stopOrbit();
   svg.setPointerCapture(e.pointerId);svg.classList.add('rotating');e.preventDefault();
  });
  svg.addEventListener('pointermove',e=>{
-  if(!gesture)return;
+  if(!gesture||e.pointerId!==gesture.pointerId)return;
+  if(e.pointerType==='mouse'&&e.buttons===0){finish();return;}
+  if(e.pointerType==='touch'&&!gesture.embedding&&Math.abs(e.clientY-gesture.y)>Math.abs(e.clientX-gesture.x))return;
   if(gesture.embedding){
-   const r=svg.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*(narrow()?560:760)+(narrow()?100:0),y=(e.clientY-r.top)/r.height*470;
+   const r=svg.getBoundingClientRect(),b=gesture.box,x=b.left+(e.clientX-r.left)/r.width*b.width+gesture.offset[0],y=b.top+(e.clientY-r.top)/r.height*b.height+gesture.offset[1];
    state.vector=spherePoint(x,y,gesture.radius,camera(views.act.yaw,views.act.pitch,174),gesture.hemisphere);
   }else{
    views[view].yaw=gesture.yaw+(e.clientX-gesture.x)*.008;
@@ -178,8 +202,9 @@ function bindScene(svg,view){
   }
   repaint();
  });
- const finish=()=>{if(!gesture)return;gesture=null;if(view==='hero'){heroDragging=false;heroResumeAt=performance.now()+2000;}svg.classList.remove('rotating');};
+ const finish=e=>{if(!gesture||(e?.pointerId!==undefined&&e.pointerId!==gesture.pointerId))return;gesture=null;if(view==='hero'){heroDragging=false;heroResumeAt=performance.now()+2000;}svg.classList.remove('rotating');};
  svg.addEventListener('pointerup',finish);svg.addEventListener('pointercancel',finish);svg.addEventListener('lostpointercapture',finish);
+ addEventListener('blur',finish);
  svg.addEventListener('keydown',e=>{
   if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))return;
   e.preventDefault();
@@ -213,7 +238,8 @@ function bind(){
 function init(){
  renderMath();$('#scenario').innerHTML=labels.map((l,i)=>`<option value="${i}">${l.name}</option>`).join('');$('#axis-select').innerHTML=makeAxes(actoutFrame.centroids).map((a,i)=>`<option value="${i}" ${i===1?'selected':''}>${a.name}</option>`).join('');
  $('#results-table').innerHTML=[results[0],results[1],results[3],results[6],results[7]].map((r,i)=>`<tr class="${i===0?'ours':''}"><th scope="row">${r.name}</th><td>${r.as.toFixed(4)}</td><td>${r.ae.toFixed(2)}</td><td>${r.mt.toFixed(2)}</td></tr>`).join('');
- addEventListener('resize',()=>{state.module==='actout'?drawActout():drawTrain();drawHero();});
+ let wasCompact=compactMath();
+ addEventListener('resize',()=>{if(wasCompact!==compactMath()){wasCompact=compactMath();renderMath();}state.module==='actout'?drawActout():drawTrain();drawHero();});
  bind();drawTrain();drawHero();
  paperDeck=initPaperDeck(({page,target})=>{
   if(page!=='lab'){state.playing=false;updatePlay();stopOrbit();}

@@ -102,7 +102,7 @@ body.deck-ready{background:#fff}
 .deck-ready :is(.page-next,.page-previous):focus-visible{color:var(--olive);transform:scale(1.1)}
 .page-next:focus-visible #page-next-arrow{animation:next-cue .84s linear 1}
 .page-previous:focus-visible #page-previous-arrow{animation:previous-cue .84s linear 1}
-@media(hover:hover){
+@media(hover:hover) and (min-width:601px){
  .deck-ready :is(.page-next,.page-previous):hover{color:var(--olive);transform:scale(1.1)}
  .page-next:hover #page-next-arrow{animation:next-cue .84s linear 1}
  .page-previous:hover #page-previous-arrow{animation:previous-cue .84s linear 1}
@@ -114,3 +114,64 @@ body.deck-ready{background:#fff}
 
 /* The experiment summary is one concise statement. */
 .deck-ready .experiments .findings{grid-template-columns:1fr}
+
+/* Keep every plot annotation inside native SVG coordinates. */
+.plot-math{font-family:Georgia,"Times New Roman",serif;font-style:italic;fill:var(--ink);paint-order:stroke;stroke:#fff;stroke-width:2px;stroke-linejoin:round}
+.plot svg,.hero-figure svg{overflow:hidden;isolation:isolate}
+/* Touch feedback uses the same gentle scale and decaying arrow cue as hover. */
+.deck-ready :is(.page-next,.page-previous).tap-cue{animation:tap-navigation .42s var(--ease)}
+.page-next.tap-cue #page-next-arrow{animation:next-cue .84s linear 1}
+.page-previous.tap-cue #page-previous-arrow{animation:previous-cue .84s linear 1}
+@keyframes tap-navigation{0%,100%{transform:scale(1)}45%{transform:scale(1.1)}}
+@media(max-width:600px){
+ .site-header nav{display:none}
+ .site-header .brand{font-size:17px}
+ .deck-ready .story-card{scroll-padding-top:14px;overflow-x:hidden}
+ .plot svg,.hero-figure svg{touch-action:pan-y}
+ .drag-handle{touch-action:none}
+ .deck-ready .plot-toolbar{min-height:48px}
+ .deck-ready .transport,.deck-ready .actout-transport{margin-left:0;margin-right:0}
+ .deck-ready .play-button,.deck-ready .transport #next{min-width:40px;min-height:40px}
+ .deck-ready select{font-size:16px;min-height:44px}
+ .deck-ready input[type=range]{height:40px;margin:4px 0;background:linear-gradient(#dce3d5,#dce3d5) center/100% 4px no-repeat}
+ .deck-ready .equation-strip,.deck-ready .actout-equations .equation-strip{padding:20px 0}
+ .deck-ready .equation-strip>div{overflow:visible;max-width:100%}
+ .deck-ready .equation-strip .katex{font-size:19px}
+ .deck-ready .actout-equations .katex{font-size:18px}
+ .deck-ready .legend,.deck-ready .sampling-details{padding-left:0;padding-right:0}
+ .deck-ready .axis-contributions{margin-left:0;margin-right:0;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px 16px}
+ .deck-ready .contribution{font-size:13px;min-height:44px}
+ .deck-ready .contribution>div{display:flex}
+ .deck-ready .table-scroll{overflow:visible}
+ .deck-ready table{min-width:0;width:100%;table-layout:fixed;font-size:14px}
+ .deck-ready .experiments th,.deck-ready .experiments td{padding:11px 4px;overflow-wrap:break-word}
+ .deck-ready .experiments th:first-child{width:31%}
+ .deck-ready .experiments thead th{font-size:12px;vertical-align:top}
+ .deck-ready .experiments thead th span{font-size:11px;line-height:1.4;display:inline-block}
+ .deck-ready .experiments tr.ours th{font-size:14px}
+ .deck-ready .experiments tr.ours td{font-size:16px}
+ .deck-ready .experiments td{white-space:nowrap}
+ .deck-ready .citation-fallback pre{font-size:13px}
+}
+@media(min-width:601px) and (max-width:1000px){
+ .deck-ready .equation-strip,.deck-ready .actout-equations .equation-strip{display:block;padding-left:0;padding-right:0}
+ .deck-ready .equation-strip>div{overflow:visible;max-width:100%}
+ .deck-ready .equation-strip .katex{font-size:19px}
+ .deck-ready .actout-equations .katex{font-size:18px}
+}
+
+@media(max-width:600px){
+ .deck-ready button.text-button{min-height:40px}
+ .deck-ready .transfer-button{min-height:44px}
+ .deck-ready :is(.citation-fallback,.sampling-details) summary{min-height:44px;padding-top:10px;padding-bottom:10px}
+ .deck-ready input[type=range]::-webkit-slider-thumb{width:16px;height:16px}
+ .deck-ready input[type=range]::-moz-range-thumb{width:12px;height:12px}
+}
+
+@media(hover:none) and (pointer:coarse){
+ .deck-ready select{font-size:16px;min-height:44px}
+}
+@media(any-pointer:coarse){
+ .plot svg,.hero-figure svg{touch-action:pan-y}
+ .drag-handle{touch-action:none}
+}
