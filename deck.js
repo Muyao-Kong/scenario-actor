@@ -1,3 +1,16 @@
+// A gesture is armed only at the edge where it begins. Reaching an edge while
+// reading never turns the page; the reader must make a fresh outward gesture.
+export function edgeGesture({top,bottom}){
+ let used=false;
+ return (x,y,threshold=64)=>{
+  if(used||Math.abs(y)<threshold||Math.abs(y)<Math.abs(x)*1.4)return 0;
+  const direction=y>0?1:-1;
+  if((direction>0&&!bottom)||(direction<0&&!top))return 0;
+  used=true;
+  return direction;
+ };
+}
+
 // Chapter navigation keeps the existing simulations mounted and their state intact.
 export function initPaperDeck(onChange=()=>{}){
  const pages=[...document.querySelectorAll('[data-paper-page]')];
@@ -9,6 +22,8 @@ export function initPaperDeck(onChange=()=>{}){
  const nextLabel=document.querySelector('#page-next-label');
  const nextArrow=document.querySelector('#page-next-arrow');
  const announcement=document.querySelector('#page-announcement');
+ const mobile=matchMedia('(max-width: 600px), (hover: none) and (pointer: coarse)');
+ let swipeLockedUntil=0;
  const reduced=matchMedia('(prefers-reduced-motion: reduce)');
  const revealSelector='.hero-copy > *, .hero-figure, .section-heading, .lab-top, .plot-toolbar, .plot, .transport, .actout-transport, .axis-contributions, .controls > *, .equation-strip, .legend, .sampling-details, .table-scroll, .findings > p, .paper-copy > *, .qr-block';
  const reveals=new Map();
@@ -70,7 +85,7 @@ export function initPaperDeck(onChange=()=>{}){
   return page?{index:pages.indexOf(page),target}:null;
  }
 
- function show(index,{animate=true,record=true,focus=true,target=pages[index]}={}){
+ function show(index,{animate=true,record=true,focus=true,target=pages[index],entry}={}){
   if(index===current)return;
   const from=pages[current],to=pages[index],direction=index>current?1:-1;
   const sequence=++transition;
@@ -83,6 +98,7 @@ export function initPaperDeck(onChange=()=>{}){
    page.inert=!active;
    page.setAttribute('aria-hidden',String(!active));
   });
+  swipeLockedUntil=from?performance.now()+800:0;
   current=index;
   document.body.dataset.activePage=to.id;
   previous.hidden=index===0;
@@ -95,6 +111,7 @@ export function initPaperDeck(onChange=()=>{}){
   next.href=`#${following.id}`;
   nextLabel.textContent=index===pages.length-1?'Back to top':following.dataset.paperPage;
   nextArrow.hidden=index===pages.length-1;
+  next.dataset.last=String(index===pages.length-1);
   next.setAttribute('aria-label',index===pages.length-1?'Back to top':`Next page: ${nextLabel.textContent}`);
   announcement.textContent=`${to.dataset.paperPage}, page ${index+1} of ${pages.length}`;
   document.querySelectorAll('.site-header a[href^="#"]').forEach(link=>{
@@ -103,6 +120,7 @@ export function initPaperDeck(onChange=()=>{}){
   });
   if(record)history.pushState({paperPage:to.id},'',`#${to.id}`);
   onChange({page:to.id,target,previous:from?.id});
+  if(entry)to.scrollTop=entry==='bottom'?to.scrollHeight:0;
   if(focus){const heading=to.querySelector('h1,h2');heading.tabIndex=-1;heading.focus({preventScroll:true});}
   watchContent(to,direction,!!from&&animate);
 
@@ -121,7 +139,58 @@ export function initPaperDeck(onChange=()=>{}){
   if(!dest)return;
   event.preventDefault();
   if(link===next||link===previous)tapCue(link);
-  show(dest.index,{target:dest.target});
+  show(dest.index,{target:dest.target,entry:mobile.matches?(dest.index<current&&dest.index!==0?'bottom':'top'):undefined});
+ });
+ // Keep native page scrolling and chart gestures. Only an outward gesture
+ // started at a boundary can request a chapter transition.
+ const blocked=target=>target.closest('input,select,textarea,button,a,summary,[contenteditable],.drag-handle');
+ function begin(page){
+  if(!mobile.matches||page!==pages[current]||performance.now()<swipeLockedUntil)return null;
+  return edgeGesture({top:page.scrollTop<=2,bottom:page.scrollHeight-page.clientHeight-page.scrollTop<=2});
+ }
+ function turn(direction){
+  const index=current+direction;
+  if(index<0||index>=pages.length)return;
+  const page=pages[current];
+  if(direction>0?page.scrollHeight-page.clientHeight-page.scrollTop>2:page.scrollTop>2)return;
+  show(index,{entry:direction>0?'top':'bottom'});
+ }
+ pages.forEach(page=>{
+  let touch=null,wheel=null,wheelTime=0,wheelX=0,wheelY=0;
+  page.addEventListener('touchstart',event=>{
+   touch=null;
+   if(event.touches.length!==1||blocked(event.target))return;
+   const start=event.touches[0],gesture=begin(page);
+   if(gesture)touch={x:start.clientX,y:start.clientY,gesture,top:page.scrollTop<=2,bottom:page.scrollHeight-page.clientHeight-page.scrollTop<=2};
+  },{passive:true});
+  page.addEventListener('touchmove',event=>{
+   if(!touch||event.touches.length!==1){touch=null;return;}
+   const point=event.touches[0];
+   const x=touch.x-point.clientX,y=touch.y-point.clientY;
+   const outward=y>0?touch.bottom&&page.scrollHeight-page.clientHeight-page.scrollTop<=2:touch.top&&page.scrollTop<=2;
+   if(Math.abs(y)>Math.abs(x)*1.4&&outward&&event.cancelable)event.preventDefault();
+   const direction=touch.gesture(x,y);
+   if(direction){
+    if(event.cancelable)event.preventDefault();
+    touch=null;
+    turn(direction);
+   }
+  },{passive:false});
+  page.addEventListener('touchend',()=>{touch=null;},{passive:true});
+  page.addEventListener('touchcancel',()=>{touch=null;},{passive:true});
+  // Wheel support uses the same boundary rule for narrow windows and trackpads.
+  // A continuous wheel burst (including momentum) can turn at most one page.
+  page.addEventListener('wheel',event=>{
+   if(!mobile.matches||page!==pages[current]||event.ctrlKey||blocked(event.target))return;
+   const now=performance.now();
+   if(now<swipeLockedUntil){event.preventDefault();wheel=null;wheelTime=now;return;}
+   if(now-wheelTime>220){wheel=begin(page);wheelX=0;wheelY=0;}
+   wheelTime=now;
+   const unit=event.deltaMode===1?16:event.deltaMode===2?page.clientHeight:1;
+   wheelX+=event.deltaX*unit;wheelY+=event.deltaY*unit;
+   const direction=wheel?.(wheelX,wheelY,72);
+   if(direction){event.preventDefault();turn(direction);}
+  },{passive:false});
  });
  const restore=()=>{const dest=destination(location.hash)||{index:0};show(dest.index,{record:false,target:dest.target});};
  addEventListener('popstate',restore);

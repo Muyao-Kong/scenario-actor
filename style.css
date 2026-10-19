@@ -175,3 +175,18 @@ body.deck-ready{background:#fff}
  .plot svg,.hero-figure svg{touch-action:pan-y}
  .drag-handle{touch-action:none}
 }
+
+/* On phones, chapter controls sit beside the brand, outside the reading area. */
+@media(max-width:600px), (hover:none) and (pointer:coarse){
+ body.deck-ready{grid-template-rows:var(--header-height) minmax(0,1fr)}
+ .deck-ready .site-header nav{display:none}
+ .deck-ready .site-header{padding-right:90px}
+ .deck-ready #paper-deck{margin-bottom:12px}
+ .deck-ready #page-navigation{position:fixed;top:0;right:max(12px,env(safe-area-inset-right));width:80px;height:var(--header-height);margin:0;display:flex;justify-content:flex-end;gap:0;z-index:10}
+ .deck-ready #page-previous,.deck-ready .page-next{display:flex;align-items:center;justify-content:center;flex-direction:row;flex:0 0 40px;min-width:40px;min-height:44px;padding:0;transform-origin:center}
+ .deck-ready #page-previous-label,.deck-ready .page-next:not([data-last=true]) #page-next-label{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+ .deck-ready #page-next-arrow,.deck-ready #page-previous-arrow{font-size:23px;line-height:1}
+ .deck-ready .page-next[data-last=true]{font-size:12px}
+ .deck-ready .page-next[data-last=true] #page-next-label{font-size:0}
+ .deck-ready .page-next[data-last=true] #page-next-label:after{content:'Top';font-size:13px}
+}
