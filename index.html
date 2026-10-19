@@ -10,7 +10,7 @@
   <link rel="canonical" href="https://muyao-kong.github.io/scenario-actor/">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Scenario-Actor — Interactive explanation">
-  <meta property="og:description" content="Scenario embeddings and prompt-level temperature selection: an interactive explanation of the paper.">
+  <meta property="og:description" content="Scenario embeddings and temperature selection: an interactive explanation of the paper.">
   <meta property="og:url" content="https://muyao-kong.github.io/scenario-actor/">
   <meta property="og:image" content="https://muyao-kong.github.io/scenario-actor/assets/social.png">
   <meta name="twitter:card" content="summary_large_image">
@@ -21,9 +21,9 @@
   <meta name="citation_pdf_url" content="https://arxiv.org/pdf/2610.18820">
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <link rel="stylesheet" href="assets/katex/katex.min.css">
-  <link rel="stylesheet" href="style.css?v=mobile-swipe1">
+  <link rel="stylesheet" href="style.css?v=copy3">
   <script defer src="assets/katex/katex.min.js"></script>
-  <script type="module" src="app.js?v=mobile-swipe1"></script>
+  <script type="module" src="app.js?v=copy3"></script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Scenario-Actor","url":"https://muyao-kong.github.io/scenario-actor/","description":"Interactive visualization of scenario embeddings and scenario-adaptive sampling temperature.","about":{"@type":"ScholarlyArticle","name":"Read the Room Before Your Model Generates","url":"https://arxiv.org/abs/2610.18820","author":[{"@type":"Person","name":"Muyao Kong"},{"@type":"Person","name":"Zhihao Lin"}]}}</script>
 </head>
 <body>
@@ -36,14 +36,14 @@
 <section class="hero wrap story-card" id="overview" data-paper-page="Overview" aria-labelledby="hero-title">
   <div class="hero-copy">
     <h1 id="hero-title">Read the Room <br>Before Your Model <br><em>Generates</em></h1>
-    <p class="hero-description">Scenario-Actor uses the geometry of a scenario embedding to select a prompt-level sampling temperature.</p>
+    <p class="hero-description">Scenario-Actor uses the geometry of a scenario embedding to select a sampling temperature.</p>
     <div class="hero-actions"><a href="https://arxiv.org/abs/2610.18820" target="_blank" rel="noopener">Paper ↗</a></div>
     <p class="authors">Muyao Kong · Zhihao Lin <span>2026</span></p>
   </div>
   <div class="hero-figure"><svg id="hero-space" viewBox="0 0 760 470" role="img" tabindex="0" aria-label="Three-dimensional scenario space. Drag or use arrow keys to rotate the view."></svg><div class="hero-caption"><span><i class="point-key"></i> Scenario embedding</span></div></div>
 </section>
 <section class="lab-section wrap story-card" id="lab" data-paper-page="Method" aria-labelledby="lab-title">
-  <div class="section-heading"><h2 id="lab-title">Method</h2><p>Interactive 3D simulation with synthetic inputs. The paper uses 32D embeddings.</p></div>
+  <div class="section-heading"><h2 id="lab-title">Method</h2><p>The paper uses 32D embeddings.</p></div>
   <div class="lab-shell">
     <div class="lab-top"><div class="module-tabs" role="tablist" aria-label="Framework module"><button id="tab-scenarize" role="tab" aria-selected="true" aria-controls="panel-scenarize" data-module="scenarize">Scenarize</button><button id="tab-actout" role="tab" aria-selected="false" aria-controls="panel-actout" data-module="actout">Actout</button></div><button class="text-button" id="reset" aria-label="Reset simulation">Reset</button></div>
     <div id="panel-scenarize" role="tabpanel" aria-labelledby="tab-scenarize">
@@ -90,14 +90,14 @@
         <div class="equation-strip"><a class="equation-number" href="https://arxiv.org/pdf/2610.18820#page=4" target="_blank" rel="noopener">Eq. 3 ↗</a><div data-math-mobile="\begin{gathered}T=\frac{\displaystyle\sum_{i=1}^{k}|\hat{s}_{\mathcal P}^{\top}\hat{u}_i|\left(\begin{gathered}\frac{1+\hat{s}_{\mathcal P}^{\top}\hat{u}_i}{2}\tau_i^+\\+\frac{1-\hat{s}_{\mathcal P}^{\top}\hat{u}_i}{2}\tau_i^-\end{gathered}\right)}{\displaystyle\sum_{i=1}^{k}|\hat{s}_{\mathcal P}^{\top}\hat{u}_i|},\\u_i=s_i^+-s_i^-,\\\sum_{i=1}^{k}|\hat{s}_{\mathcal P}^{\top}\hat{u}_i|>0\end{gathered}" data-math="T=\frac{\displaystyle\sum_{i=1}^{k}|\hat{s}_{\mathcal P}^{\top}\hat{u}_i|\left(\frac{1+\hat{s}_{\mathcal P}^{\top}\hat{u}_i}{2}\tau_i^++\frac{1-\hat{s}_{\mathcal P}^{\top}\hat{u}_i}{2}\tau_i^-\right)}{\displaystyle\sum_{i=1}^{k}|\hat{s}_{\mathcal P}^{\top}\hat{u}_i|},\qquad u_i=s_i^+-s_i^-,\qquad\sum_{i=1}^{k}|\hat{s}_{\mathcal P}^{\top}\hat{u}_i|>0"></div></div>
       </div>
       <div class="legend"><span><i class="point-key"></i> Prompt embedding</span><span><i class="axis-key"></i> Selected axis</span><span><i class="centroid-key"></i> Class centroid</span><span class="projection-key">┄</span><span>Orthogonal projection</span></div>
-      <details class="sampling-details"><summary>Sampling distribution</summary><div class="sampling-row"><div data-math="p(v\mid T)=\frac{\exp(z_v/T)}{\sum_u\exp(z_u/T)}"></div><div id="token-bars" aria-label="Illustrative next-token probabilities"></div></div><p class="note">Illustrative logits. The selected temperature stays fixed during this prompt’s generation.</p></details>
+      <details class="sampling-details"><summary>Sampling distribution</summary><div class="sampling-row"><div data-math="p(v\mid T)=\frac{\exp(z_v/T)}{\sum_u\exp(z_u/T)}"></div><div id="token-bars" aria-label="Illustrative next-token probabilities"></div></div><p class="note">The selected temperature stays fixed during this prompt’s generation.</p></details>
     </div>
   </div>
 </section>
 <section id="experiments" class="experiments wrap story-card" data-paper-page="Experiments" aria-labelledby="experiment-title">
-  <div class="section-heading"><h2 id="experiment-title">Experiments</h2><p>Llama-3.1-8B-Instruct · selected baselines from Table 1</p></div>
+  <div class="section-heading"><h2 id="experiment-title">Experiments</h2></div>
   <div class="table-scroll"><table><thead><tr><th scope="col">Method</th><th scope="col">Agent<wbr>Sense<br><span>Goal completion</span></th><th scope="col">Alpaca<wbr>Eval<br><span>LC-WR (%)</span></th><th scope="col">MT-<wbr>Bench<br><span>GPT-4 score</span></th></tr></thead><tbody id="results-table"></tbody></table></div>
-  <div class="findings"><p>Scenario-Actor achieves the highest scores on all three benchmarks in Table 1.</p></div>
+  <div class="findings"><p>Llama-3.1-8B-Instruct results with selected baselines from Table 1.</p></div>
 </section>
 <section class="paper-section wrap story-card" id="paper" data-paper-page="Paper" aria-labelledby="paper-title">
   <div class="paper-copy"><h2 id="paper-title">Read the room,<br><em>Share the room</em></h2><p class="paper-title">Read the Room Before Your Model Generates</p><p class="authors">Muyao Kong · Zhihao Lin <span>2026</span></p><div class="paper-actions"><a class="paper-button" href="https://arxiv.org/abs/2610.18820" target="_blank" rel="noopener">Read on arXiv <span>↗</span></a></div><details class="citation-fallback"><summary>BibTeX</summary><div class="citation-panel"><div class="citation-toolbar"><output id="copy-status" class="note" aria-live="polite"></output><button class="text-button" id="copy-citation">Copy</button></div><pre id="bibtex">@article{kong2026read,

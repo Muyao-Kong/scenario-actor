@@ -190,3 +190,5 @@ body.deck-ready{background:#fff}
  .deck-ready .page-next[data-last=true] #page-next-label{font-size:0}
  .deck-ready .page-next[data-last=true] #page-next-label:after{content:'Top';font-size:13px}
 }
+
+.experiments tbody .katex{font-size:1.05em;white-space:nowrap}
