@@ -61,3 +61,23 @@ test('the geometric angle arc lies on the actual 3D plane of the two vectors',()
 test('azimuth and elevation controls preserve norm and can leave the xy plane',()=>{
  const p=rotateVector([1,0,0],.2,.3);close(norm(p),1);assert.ok(p[2]>.25);
 });
+
+test('normalized Actout handles start without a jump and stay on the unit sphere',()=>{
+ const axes=makeAxes(trainingRun().at(-1).centroids);
+ for(const raw of [[.58,.32,.46],[.08,.12,.04],[.8,1.1,-.6]]){
+  const s=unit(raw);
+  close(norm(s),1);
+  close(actout(raw,axes).temperature,actout(s,axes).temperature);
+  for(const c of [camera(),camera(-1.1,.7)]){
+   const [x,y]=project(s,c),side=Math.sign(dot(s,c.depth));
+   const initial=spherePoint(x,y,1,c,side);
+   close(dist(initial,s),0);
+   close(actout(initial,axes).temperature,actout(raw,axes).temperature);
+   for(const [dx,dy] of [[40,25],[1000,-1000]]){
+    const moved=spherePoint(x+dx,y+dy,1,c,side);
+    close(norm(moved),1);
+    close(norm(rotateVector(moved,.2,.1)),1);
+   }
+  }
+ }
+});

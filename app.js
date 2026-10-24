@@ -2,7 +2,7 @@ import {initPaperDeck} from './deck.js?v=mobile-swipe1';
 import {add,labels,results,trainingRun,forward,inputs,makeAxes,actout,unit,norm,dot,scale,sub,dist,mix,smooth,triplet} from './geometry.js?v=3d5';
 import {camera,project,spherePoint,angleArc,rotateVector} from './scene3d.js?v=3d5';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
-const state={module:'scenarize',view:'train',step:0,token:0,playing:false,scenario:0,beta:.3,lr:.0035,selectedAxis:1,vector:[.58,.32,.46],orbit:false,overrides:{}};
+const state={module:'scenarize',view:'train',step:0,token:0,playing:false,scenario:0,beta:.3,lr:.0035,selectedAxis:1,vector:unit([.58,.32,.46]),orbit:false,overrides:{}};
 let frames=trainingRun(), last=0, heroDragging=false, heroResumeAt=0, heroSpeed=0, lastHeroDraw=0, actoutFrame=frames.at(-1);
 let paperDeck=null;
 const mathCache=new Map();
@@ -125,9 +125,8 @@ function drawActout(){
  });
  s+=`<path d="${arc(u,sn,.3)}" stroke="#5e7699" stroke-width="1.2" fill="none"/>`;
  const midpoint=angleArc(u,sn,.4)[18];s+=ml(midpoint,'\\theta_i',55,[-7,-16]);
- s+=line([0,0,0],sn,'#d47747',1.7,'marker-end="url(#act-arrow)"')+circle(sn,5,'#d47747','opacity=".18"');
- s+=circle(state.vector,22,'#d47747','opacity=".06"')+`<g class="drag-handle" id="embedding-handle" role="slider" tabindex="0" aria-label="3D scenario embedding. Left/right change azimuth; up/down change elevation." aria-valuemin="-180" aria-valuemax="180" aria-valuenow="${Math.round(Math.atan2(state.vector[1],state.vector[0])*180/Math.PI)}">${circle(state.vector,narrow()?44:24,'transparent')}${circle(state.vector,7,'#d47747','stroke="white" stroke-width="2.5"')}</g>`+ml(state.vector,'s_{\\mathcal P}',75,[10,-30]);
- if(Math.abs(norm(state.vector)-1)>.12)s+=circle(sn,4,'white','stroke="#d47747" stroke-width="1.5"')+ml(sn,'\\hat{s}_{\\mathcal P}',80,[-75,-32]);
+ s+=line([0,0,0],sn,'#d47747',1.7,'marker-end="url(#act-arrow)"');
+ s+=circle(sn,22,'#d47747','opacity=".06"')+`<g class="drag-handle" id="embedding-handle" role="slider" tabindex="0" aria-label="Normalized 3D scenario embedding. Left/right change azimuth; up/down change elevation." aria-valuemin="-180" aria-valuemax="180" aria-valuenow="${Math.round(Math.atan2(sn[1],sn[0])*180/Math.PI)}">${circle(sn,narrow()?44:24,'transparent')}${circle(sn,7,'#d47747','stroke="white" stroke-width="2.5"')}</g>`+ml(sn,'\\hat{s}_{\\mathcal P}',80,[14,-34]);
  sizePlot($('#actout-space'));$('#actout-space').innerHTML=s;
  $('#rho-value').textContent=(selected.rho>=0?'+':'')+selected.rho.toFixed(3);$('#angle-caption').textContent=`θ = ${(Math.acos(selected.rho)*180/Math.PI).toFixed(1)}°`;
  const temp=out.temperature;$('#temperature-value').textContent=temp===null?'—':temp.toFixed(3);
@@ -180,9 +179,9 @@ function bindScene(svg,view){
   if(!e.isPrimary||e.button!==0)return;
   const embedding=view==='act'&&!!e.target.closest('#embedding-handle');
   const c=camera(views[view].yaw,views[view].pitch,174);
-  gesture={pointerId:e.pointerId,x:e.clientX,y:e.clientY,yaw:views[view].yaw,pitch:views[view].pitch,embedding,hemisphere:dot(state.vector,c.depth)>=0?1:-1,radius:Math.max(.12,norm(state.vector))};
+  gesture={pointerId:e.pointerId,x:e.clientX,y:e.clientY,yaw:views[view].yaw,pitch:views[view].pitch,embedding,hemisphere:dot(state.vector,c.depth)>=0?1:-1,radius:1};
   if(embedding){
-   const r=svg.getBoundingClientRect(),p=project(state.vector,c),[left,top,width,height]=svg.getAttribute('viewBox').split(/\s+/).map(Number);
+   const r=svg.getBoundingClientRect(),p=project(unit(state.vector),c),[left,top,width,height]=svg.getAttribute('viewBox').split(/\s+/).map(Number);
    gesture.box={left,top,width,height};
    gesture.offset=[p[0]-left-(e.clientX-r.left)/r.width*width,p[1]-top-(e.clientY-r.top)/r.height*height];
   }
@@ -225,8 +224,8 @@ function bind(){
  $('#progress').addEventListener('input',e=>{state.playing=false;state.view==='train'?state.step=+e.target.value:state.token=+e.target.value;updatePlay();drawTrain();});
  $('#scenario').addEventListener('change',e=>{state.scenario=+e.target.value;drawTrain();});
  $('#margin').addEventListener('input',e=>{state.beta=+e.target.value;$('#margin-value').textContent=state.beta.toFixed(2);rebuild();});
- $('#reset').addEventListener('click',()=>{views.train={yaw:.65,pitch:.38};views.act={yaw:.65,pitch:.38};if(state.module==='actout'){stopOrbit();state.vector=[.58,.32,.46];state.overrides={};syncEndpoints();drawActout();}else {state.playing=false;state.step=state.view==='infer'?160:0;state.token=0;updatePlay();drawTrain();}});
- $('#transfer').addEventListener('click',()=>{actoutFrame=state.view==='train'?frames[Math.round(state.step)]:frames.at(-1);const p=state.view==='train'?actoutFrame.chosen[state.scenario][0]:forward(actoutFrame.model,inputs(state.scenario,0))[Math.floor(state.token)];state.vector=norm(p)>1e-6?[...p]:[.58,.32,.46];state.overrides={};setModule('actout');});
+ $('#reset').addEventListener('click',()=>{views.train={yaw:.65,pitch:.38};views.act={yaw:.65,pitch:.38};if(state.module==='actout'){stopOrbit();state.vector=unit([.58,.32,.46]);state.overrides={};syncEndpoints();drawActout();}else {state.playing=false;state.step=state.view==='infer'?160:0;state.token=0;updatePlay();drawTrain();}});
+ $('#transfer').addEventListener('click',()=>{actoutFrame=state.view==='train'?frames[Math.round(state.step)]:frames.at(-1);const p=state.view==='train'?actoutFrame.chosen[state.scenario][0]:forward(actoutFrame.model,inputs(state.scenario,0))[Math.floor(state.token)];state.vector=unit(norm(p)>1e-6?p:[.58,.32,.46]);state.overrides={};setModule('actout');});
  $('#axis-select').addEventListener('change',e=>{state.selectedAxis=+e.target.value;syncEndpoints();drawActout();});
  $('#axis-contributions').addEventListener('click',e=>{const b=e.target.closest('[data-axis]');if(b){state.selectedAxis=+b.dataset.axis;syncEndpoints();drawActout();}});
  for(const [id,key] of [['tau-plus','plus'],['tau-minus','minus']])$('#'+id).addEventListener('input',e=>{state.overrides[state.selectedAxis]={...state.overrides[state.selectedAxis],[key]:+e.target.value};$('#'+id+'-value').textContent=endpointText(+e.target.value);drawActout();});
